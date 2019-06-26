@@ -14,7 +14,7 @@ CSS: placholder created
 
 Assets/components:
   Waves [ ]
-  Letter Tile template [ ]
+  Letter Tile template [-] (basic and hardcoded)
   Clouds [ ]
   Title [ ]
   Radar [ ]
