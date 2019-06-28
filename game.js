@@ -45,7 +45,7 @@ function tile() {
     element.className = "tile";
     var innerElement = document.createElement('div');
     innerElement.className = "inner";
-    innerElement.innerHTML = "K";
+    innerElement.innerHTML = '<svg viewBox="0 0 100 100"><text x="18" y="90%">X</text></svg>';
     element.append(innerElement);
     return element;
   };

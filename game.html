@@ -12,14 +12,22 @@
         width:100px;
         height:100px;
       }
+      #playarea2 {
+        width:50px;
+        height:50px;
+        left:200px;
+      }
     </style>
     <link rel="stylesheet" type="text/css" href="game.css" />
   </head>
   <body>
     <div id="playarea">lo</div>
+    <div id="playarea2">hi</div>
     <script type='text/javascript'>
       var Game = new game("Anagram Shark Attack JS-E", "#playarea");
       Game.start();
+      var Game2 = new game("Anagram Shark Attack JS-E", "#playarea2");
+      Game2.start();
     </script>
   </body>
 </html>
