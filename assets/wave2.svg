@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="210mm" height="297mm" version="1.1" viewBox="0 0 210 297" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <linearGradient id="linearGradient4644" x1="159.59" x2="161.4" y1="122.74" y2="87.461" gradientTransform="translate(0 -77.241)" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#72ace4" offset="0"/>
+   <stop stop-color="#fefefe" offset="1"/>
+  </linearGradient>
+ </defs>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <path d="m0 7.5471c4.8554 12.116 12.918 10.869 22.05 6.4145 7.0826 6.8599 26.994 0.8909 30.335-4.5436 8.5972 1.96 17.462 4.7218 23.386 9.889 11.893 0.71272 21.916-2.0491 29.266-9.889 13.723 8.6316 15.713 10.417 23.386 13.096 11.626-0.8909 12.829-10.334 22.584-13.631 7.5281 12.116 24.411 13.809 32.473 6.1472 5.5681 9.4435 17.818-4.8999 26.861-5.6127v51.316h-210.61z" fill="url(#linearGradient4644)" stroke="#000" stroke-linecap="round" stroke-width=".465"/>
+</svg>

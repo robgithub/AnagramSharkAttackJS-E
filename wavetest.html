@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-GB" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>SVG wave test</title>
+    <script type='text/javascript' src="game.js"></script>
+    <style type="text/css">
+      body {
+	      background-color: #ffe1a3;
+      }
+      svg {
+        position:absolute;
+      }
+      #wave1 {
+        z-index:1;
+        top:10em;
+      }
+      #wave2 {
+        top:13em;
+      }
+      #wave1 .wave-path {
+          animation: wave-rotate 5s linear infinite both;
+          transform-origin: 50% 50%;
+      }
+      #wave2 .wave-path {
+          animation: wave-rotate 5.5s linear infinite both;
+          animation-delay: 0.5s;
+          transform-origin: 50% 50%;
+      }
+     @keyframes wave-rotate {
+            0%   { transform: rotate(-2deg);}
+            25%   { transform: rotate(0deg);}
+            50% { transform: rotate(2deg);}
+            75%   { transform: rotate(-0deg);}
+            100% { transform: rotate(-2deg);}
+      }
+
+    </style>
+  </head>
+  <body>
+<div>Start</div>
+<svg id="wave1" width="220mm" height="97mm" version="1.1" viewBox="0 0 220 97" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <linearGradient id="linearGradient4615" x1="161.42" x2="162.85" y1="73.196" y2="37.114" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#72ace4" offset="0"/>
+   <stop stop-color="#fefefe" offset="1"/>
+  </linearGradient>
+ </defs>
+ <path class="wave-path" d="m-0.14313 40.956c10.471 2.7618 20.943 5.5236 27.559 4.1872 6.6165-1.3365 9.3783-6.7711 10.893-9.4436 1.5145-2.6725 1.7818-2.5834 5.744-0.04584 3.9622 2.5376 11.628 7.5296 16.929 8.2867s8.2409-2.7174 9.8891-4.5437c1.6482-1.8263 2.0046-2.0045 6.6777-0.62478s13.679 4.3223 19.504 4.1007c5.8247-0.22158 8.3406-3.4315 9.5433-5.124 1.2027-1.6925 1.0245-1.7816 5.4418-0.27986 4.4173 1.5018 13.579 4.6454 19.414 4.1998 5.8354-0.4456 8.419-4.4547 9.7107-6.5928 1.2917-2.1381 1.2917-2.4054 3.0717-0.71438 1.78 1.691 5.3472 5.3473 10.238 5.597s11.323-3.0117 14.352-4.6597c3.029-1.6481 2.7617-1.7371 4.3217-0.04343 1.56 1.6937 4.9434 5.1661 9.5317 5.4333 4.5883 0.26719 10.379-2.6728 13.453-4.2318s3.43-1.7373 4.231 0.13188 2.0496 5.7931 3.7808 7.226c1.7312 1.4329 3.9464 0.37901 6.1616-0.67486l0.5178 32.574-210.43-0.0131-0.53453-34.745z" fill="url(#linearGradient4615)" fill-rule="evenodd" stroke="#000" stroke-width=".465"/>
+</svg>
+<svg id="wave2" width="220mm" height="97mm" version="1.1" viewBox="0 0 220 97"  xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <linearGradient id="linearGradient4644" x1="159.59" x2="161.4" y1="122.74" y2="87.461" gradientTransform="translate(0 -77.241)" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#72ace4" offset="0"/>
+   <stop stop-color="#fefefe" offset="1"/>
+  </linearGradient>
+ </defs>
+ <path class="wave-path" d="m0 7.5471c4.8554 12.116 12.918 10.869 22.05 6.4145 7.0826 6.8599 26.994 0.8909 30.335-4.5436 8.5972 1.96 17.462 4.7218 23.386 9.889 11.893 0.71272 21.916-2.0491 29.266-9.889 13.723 8.6316 15.713 10.417 23.386 13.096 11.626-0.8909 12.829-10.334 22.584-13.631 7.5281 12.116 24.411 13.809 32.473 6.1472 5.5681 9.4435 17.818-4.8999 26.861-5.6127v51.316h-210.61z" fill="url(#linearGradient4644)" stroke="#000" stroke-linecap="round" stroke-width=".465"/>
+</svg>
+
+<div>End</div>
+
+    <script type='text/javascript'>
+      console.log("wave test");
+    </script>
+  </body>
+</html>
+
