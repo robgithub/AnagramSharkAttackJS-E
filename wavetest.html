@@ -11,12 +11,21 @@
       svg {
         position:absolute;
       }
+      #waves-container{
+        position:absolute;
+        top:55mm;
+      }
       #wave1 {
-        z-index:1;
-        top:10em;
+        z-index:10;
+        top:0mm;
       }
       #wave2 {
-        top:13em;
+        top:22mm;
+        z-index:4;
+      }
+      #wave3 {
+        top:0mm;
+        z-index:3;
       }
       #wave1 .wave-path {
           animation: wave-rotate 5s linear infinite both;
@@ -25,6 +34,11 @@
       #wave2 .wave-path {
           animation: wave-rotate 7s linear infinite both;
           animation-delay: 0.5s;
+          transform-origin: 50% 50%;
+      }
+      #wave3 .wave-path {
+          animation: wave-rotate 10s linear infinite both;
+          animation-delay: 1s;
           transform-origin: 50% 50%;
       }
      @keyframes wave-rotate {
@@ -39,14 +53,18 @@
   </head>
   <body>
 <div>Start</div>
-<svg id="wave1" width="220mm" height="97mm" version="1.1" viewBox="20 0 190 97" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+<div id="waves-container">
+
+<svg id="wave1" width="220mm" height="97mm" version="1.1" viewBox="20 0 175 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
  <defs>
   <linearGradient id="linearGradient4615" x1="161.42" x2="162.85" y1="73.196" y2="37.114" gradientUnits="userSpaceOnUse">
-   <stop stop-color="#72ace4" offset="0"/>
-   <stop stop-color="#fefefe" offset="1"/>
+    <stop offset=0% stop-color=#72ace4 >
+        <animate id=a1 class="blood-red-water" repeatCount="1" attributeName="stop-color" values="#72ace4; #ff0000" dur="3s" fill="freeze"  />
+    </stop>
+    <stop offset=100% stop-color=#fff />
   </linearGradient>
  </defs>
- <path class="wave-path" d="m-0.14313 40.956c10.471 2.7618 20.943 5.5236 27.559 4.1872 6.6165-1.3365 9.3783-6.7711 10.893-9.4436 1.5145-2.6725 1.7818-2.5834 5.744-0.04584 3.9622 2.5376 11.628 7.5296 16.929 8.2867s8.2409-2.7174 9.8891-4.5437c1.6482-1.8263 2.0046-2.0045 6.6777-0.62478s13.679 4.3223 19.504 4.1007c5.8247-0.22158 8.3406-3.4315 9.5433-5.124 1.2027-1.6925 1.0245-1.7816 5.4418-0.27986 4.4173 1.5018 13.579 4.6454 19.414 4.1998 5.8354-0.4456 8.419-4.4547 9.7107-6.5928 1.2917-2.1381 1.2917-2.4054 3.0717-0.71438 1.78 1.691 5.3472 5.3473 10.238 5.597s11.323-3.0117 14.352-4.6597c3.029-1.6481 2.7617-1.7371 4.3217-0.04343 1.56 1.6937 4.9434 5.1661 9.5317 5.4333 4.5883 0.26719 10.379-2.6728 13.453-4.2318s3.43-1.7373 4.231 0.13188 2.0496 5.7931 3.7808 7.226c1.7312 1.4329 3.9464 0.37901 6.1616-0.67486l0.5178 32.574-210.43-0.0131-0.53453-34.745z" fill="url(#linearGradient4615)" fill-rule="evenodd" stroke="#000" stroke-width=".465"/>
+ <path class="wave-path"  d="m-0.14313 40.956c10.471 2.7618 20.943 5.5236 27.559 4.1872 6.6165-1.3365 9.3783-6.7711 10.893-9.4436 1.5145-2.6725 1.7818-2.5834 5.744-0.04584 3.9622 2.5376 11.628 7.5296 16.929 8.2867s8.2409-2.7174 9.8891-4.5437c1.6482-1.8263 2.0046-2.0045 6.6777-0.62478s13.679 4.3223 19.504 4.1007c5.8247-0.22158 8.3406-3.4315 9.5433-5.124 1.2027-1.6925 1.0245-1.7816 5.4418-0.27986 4.4173 1.5018 13.579 4.6454 19.414 4.1998 5.8354-0.4456 8.419-4.4547 9.7107-6.5928 1.2917-2.1381 1.2917-2.4054 3.0717-0.71438 1.78 1.691 5.3472 5.3473 10.238 5.597s11.323-3.0117 14.352-4.6597c3.029-1.6481 2.7617-1.7371 4.3217-0.04343 1.56 1.6937 4.9434 5.1661 9.5317 5.4333 4.5883 0.26719 10.379-2.6728 13.453-4.2318s3.43-1.7373 4.231 0.13188 2.0496 5.7931 3.7808 7.226c1.7312 1.4329 3.9464 0.37901 6.1616-0.67486l0.25053 49.388-210.43-0.0131s-0.26726-51.559-0.26726-51.559z" fill="url(#linearGradient4615)" fill-rule="evenodd" stroke="#000" stroke-width=".465"/>
 </svg>
 <svg id="wave2" width="220mm" height="97mm" version="1.1" viewBox="10 0 190 97" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
  <defs>
@@ -55,9 +73,20 @@
    <stop stop-color="#fefefe" offset="1"/>
   </linearGradient>
  </defs>
- <path class="wave-path" d="m0 7.5471c4.8554 12.116 12.918 10.869 22.05 6.4145 7.0826 6.8599 26.994 0.8909 30.335-4.5436 8.5972 1.96 17.462 4.7218 23.386 9.889 11.893 0.71272 21.916-2.0491 29.266-9.889 13.723 8.6316 15.713 10.417 23.386 13.096 11.626-0.8909 12.829-10.334 22.584-13.631 7.5281 12.116 24.411 13.809 32.473 6.1472 5.5681 9.4435 17.818-4.8999 26.861-5.6127v51.316h-210.61z" fill="url(#linearGradient4644)" stroke="#000" stroke-linecap="round" stroke-width=".465"/>
+ <path class="wave-path" d="m0.26727 0.59809c4.8554 12.116 12.918 10.869 22.05 6.4145 7.0826 6.8599 26.994 0.8909 30.335-4.5436 8.5972 1.96 17.462 4.7218 23.386 9.889 11.893 0.71272 21.916-2.0491 29.266-9.889 13.723 8.6316 15.713 10.417 23.386 13.096 11.626-0.8909 12.829-10.334 22.584-13.631 7.5281 12.116 24.411 13.809 32.473 6.1472 5.5681 9.4435 17.818-4.8999 26.861-5.6127v77.775h-210.61z" fill="url(#linearGradient4644)" stroke="#000" stroke-linecap="round" stroke-width=".465"/>
 </svg>
 
+<svg id="wave3" width="220mm" height="97mm" version="1.1" viewBox="10 0 190 97" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <linearGradient id="linearGradient4750" x1="89.726" x2="92.222" y1="99.318" y2="34.284" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#0083ff" offset="0"/>
+   <stop stop-color="#f6f6f6" stop-opacity=".99216" offset="1"/>
+  </linearGradient>
+ </defs>
+ <path class="wave-path"  d="m-6.3149 30.679c4.1848-3.1181 6.0977-9.3099 12.554-9.3544 1.0666 5.9245 4.405 10.112 8.0107 9.3544 4.0957-2.94 7.3895-8.9535 12.287-8.8199 6.2338 7.3499 16.343 5.6127 22.31 10.691 2.2693-3.1627 5.7414-4.1872 8.4116-5.3454 5.7884 3.6081 13.18 3.7418 19.771 5.6127 2.9375-6.5926 6.9441-6.9045 11.218-6.949 0.04208 7.7508 10.909 0.93544 16.43 2.5391 6.1447-4.2763 14.962-9.4881 18.835-8.8199 4.4075 7.9735 7.345 17.016 17.632 11.493 3.2844-1.8258 6.5623-3.8422 8.8125-6.8154 0 0 2.6678-3.6972 5.0707-2.2718 7.0356 14.744 25.564 10.379 27.521 6.949l6.4071-8.5526c8.7729-0.31182 11.933 7.6617 17.9 11.493 1.6902-7.1272 4.4496-4.0981 6.6744-6.1472l2.6727 75.473h-222.25z" fill="url(#linearGradient4750)" stroke="#000" stroke-linecap="round" stroke-width=".465"/>
+</svg>
+
+</div>
 <div>End</div>
 
     <script type='text/javascript'>
