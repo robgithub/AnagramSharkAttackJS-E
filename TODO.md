@@ -13,9 +13,9 @@ CSS: placholder created
   Handles ALL sizing requirements
 
 Assets/components:
-  Waves [ ]
+  Waves [X]
   Letter Tile template [-] (basic and hardcoded)
-  Clouds [ ]
+  Clouds [X]
   Title [ ]
   Radar [ ]
   Radar sharks [ ]
@@ -24,3 +24,6 @@ Assets/components:
   Word lists [ ]
   Instructions [ ]
      
+
+
+
