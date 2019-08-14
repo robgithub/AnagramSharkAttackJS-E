@@ -38,5 +38,5 @@ Switch waves for rolling hills
 Switch sharks for land based animal
 Switch sharks for grabbing hand
 Switch sharks for Unicorns
-Switch waves for desert - sweets
+Switch waves for dessert - sweets
 
