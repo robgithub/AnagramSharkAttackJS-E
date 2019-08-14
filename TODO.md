@@ -17,13 +17,26 @@ Assets/components:
   Letter Tile template [-] (basic and hardcoded)
   Clouds [X]
   Title [ ]
-  Radar [ ]
-  Radar sharks [ ]
-  Sharks [ ]
+  Sonar [-]
+  Radar sharks [-]
+  Sharks [-]
   Game Over mouth [ ]
   Word lists [ ]
   Instructions [ ]
      
+Create GitHub project .io page [X]
+https://robgithub.github.io/AnagramSharkAttackJS-E/
 
 
+Post launch ideas.
+
+Sharks drop from the sky
+Sharks do parabolic leaps from the edges
+Switch sharks for dolphins
+Switch sharks for tentacles
+Switch waves for rolling hills
+Switch sharks for land based animal
+Switch sharks for grabbing hand
+Switch sharks for Unicorns
+Switch waves for dessert - sweets
 
