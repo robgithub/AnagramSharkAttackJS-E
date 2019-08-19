@@ -12,7 +12,7 @@ function game(name, targetDiv) {
   game.targetDiv = targetDiv; 
   var debugLevel = 0;
   var tiles = [];
-  var words = [ ['fish','boat','ship','crab','gull'], ['','','','','' ], ['','','','','' ], ['','','','','' ], ['','','','','' ], ['','','','','' ] ];
+  var words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','bobitworm' ], ['pufferfish','seacucumber','nudibrank','nourtilus','giantclam' ] ];
 
   game.start = function() {
     game.debug(0, "it has begun");
