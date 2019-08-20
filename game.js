@@ -20,6 +20,10 @@ function game(name, targetDiv) {
     document.querySelector(game.targetDiv).append(tiles[0].create());
   }
 
+  // return a random word for the specified level
+  game.getWord = function(level) {
+    return (words[level-1][Math.floor(game.getRandomRange(0, words[level-1].length))]);
+  };
 
   // return random value between 0 and 1.0
   game.getRandom = function() {
@@ -27,6 +31,7 @@ function game(name, targetDiv) {
   };
 
   // return random float value between min and max (including min and up to but not including the whole number max)
+  // might want to call Math.floor if the value is for an array index.
   game.getRandomRange = function(min,max) {
     return min + ( max * this.getRandom());
   };

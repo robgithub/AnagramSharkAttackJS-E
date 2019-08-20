@@ -21,7 +21,7 @@ Assets/components:
   Radar sharks [X]
   Sharks [X]
   Game Over mouth [ ]
-  Word lists [ ]
+  Word lists [X]
   Instructions [ ]
      
 Create GitHub project .io page [X]
