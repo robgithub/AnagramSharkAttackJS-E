@@ -6,18 +6,55 @@ Anagram Shark Attack JS-E
 
 */
 
+function letterPosition(x) {
+  var letterPosition = this;
+  letterPosition.x = x;
+}
 
 function game(name, targetDiv) {
   var game = this; 
   game.targetDiv = targetDiv; 
   var debugLevel = 0;
+  var level = 0; // waiting to start
+  var word = '';
   var tiles = [];
   var words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','seacucumber','nudibranch','bobbitworm','giantclam' ] ];
+  var letterPositions = [];  // where letters can be and what state each position is
+  var tileWidth = 5;
+  var tilePadding = 2;
 
+  // Public START method
   game.start = function() {
     game.debug(0, "it has begun");
-    tiles.push(new tile('S'));
+    level++;
+    word = game.getWord(level);
+    letterPositions = game.calculateLetterPositions(word);
+    tiles = game.createTiles(word, letterPositions);
     document.querySelector(game.targetDiv).append(tiles[0].create());
+  }
+
+  // Create all the tile objects
+  game.createTiles = function(word, positions) {
+    var tileArray = [];
+    for (var i = 0; i< word.length;i++) {
+      letter = word[i];
+      tileArray.push(new tile(letter.toUpperCase()));
+    }
+    return tileArray;
+  }
+  
+  // where do the letters sit in space?
+  game.calculateLetterPositions = function(word) {
+    // centering formula where 100 === 100%
+    // 100 - (100 - ((tileX + padding)*number of letters) / 2)
+    var x =  (100 - ((tileWidth + tilePadding) * word.length)) / 2;
+    var positions = [];
+    positions.push(new letterPosition(x));
+    for (var i = 1; i <= word.length; i++) {
+      x += tileWidth + tilePadding
+      positions.push(new letterPosition(x));
+    }
+    return positions;
   }
 
   // return a random word for the specified level

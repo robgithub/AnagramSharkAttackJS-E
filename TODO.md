@@ -30,7 +30,7 @@ https://robgithub.github.io/AnagramSharkAttackJS-E/
 
 Game play:
   Start button [ ]
-  Word selection per level [ ]
+  Word selection per level [X]
   calculate letter positions [ ]
   animate titles to start locations [ ]
   tiles draggable [ ]
