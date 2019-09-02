@@ -6,9 +6,10 @@ Anagram Shark Attack JS-E
 
 */
 
-function letterPosition(x) {
+function letterPosition(x, y) {
   var letterPosition = this;
   letterPosition.x = x;
+  letterPosition.y = y;
 }
 
 function game(name, targetDiv) {
@@ -22,6 +23,12 @@ function game(name, targetDiv) {
   var letterPositions = [];  // where letters can be and what state each position is
   var tileWidth = 5;
   var tilePadding = 2;
+  var restY="100";
+
+
+  game.bd = function() {
+    return tiles;
+  }
 
   // Public START method
   game.start = function() {
@@ -30,15 +37,25 @@ function game(name, targetDiv) {
     word = game.getWord(level);
     letterPositions = game.calculateLetterPositions(word);
     tiles = game.createTiles(word, letterPositions);
-    document.querySelector(game.targetDiv).append(tiles[0].create());
+    game.attachTiles(tiles);
+  }
+
+  // attach tiles to DOM
+  game.attachTiles = function(tiles) {
+    for (var i = 0; i<tiles.length;i++) {
+      document.querySelector(game.targetDiv).append(tiles[i].create());
+    }
   }
 
   // Create all the tile objects
   game.createTiles = function(word, positions) {
     var tileArray = [];
+    game.debug(0, "word.length " + word.length);
+    game.debug(0, "positions.length " + positions.length);
     for (var i = 0; i< word.length;i++) {
       letter = word[i];
-      tileArray.push(new tile(letter.toUpperCase()));
+      game.debug(0, "new letter " + letter);
+      tileArray.push(new tile(letter.toUpperCase(), i, positions[i])); // TODO send tile position, will be animation later
     }
     return tileArray;
   }
@@ -49,10 +66,10 @@ function game(name, targetDiv) {
     // 100 - (100 - ((tileX + padding)*number of letters) / 2)
     var x =  (100 - ((tileWidth + tilePadding) * word.length)) / 2;
     var positions = [];
-    positions.push(new letterPosition(x));
+    positions.push(new letterPosition(x, restY));
     for (var i = 1; i <= word.length; i++) {
       x += tileWidth + tilePadding
-      positions.push(new letterPosition(x));
+      positions.push(new letterPosition(x, restY));
     }
     return positions;
   }
@@ -82,13 +99,15 @@ function game(name, targetDiv) {
 
 }
 
-function tile(letter) {
+function tile(letter, id, pos) {
   var tile = this;
   tile.letter = letter;
+  tile.id = id;
   
   tile.create = function() {
     var element = document.createElement('div');
-    element.className = "tile";
+    element.className = "tile letter-" + letter +" tile-" + tile.id + "";
+    element.setAttribute("style","left:" + pos.x + "%;top:" + pos.y + "%");
     var innerElement = document.createElement('div');
     innerElement.className = "inner";
     innerElement.innerHTML = '<svg viewBox="0 0 100 100"><text x="18" y="90%">'+ tile.letter +'</text></svg>';
