@@ -36,8 +36,35 @@ function game(name, targetDiv) {
     level++;
     word = game.getWord(level);
     letterPositions = game.calculateLetterPositions(word);
+    var shuffled = game.shuffle(word);
+    game.debug(0, "shuffled word ["+ word +"] is [" + shuffled + "]");
     tiles = game.createTiles(word, letterPositions);
     game.attachTiles(tiles);
+  }
+  
+  // shuffle the letter order
+  game.shuffle = function(word) {
+    var shuffled = "".padStart(word.length, '_');
+    var empty = "".padStart(word.length, '$');
+    while (word != empty) {
+      var fromCharIndx = Math.floor(game.getRandomRange(0, word.length));
+      var letter = word[fromCharIndx];
+      if (letter != '$') {
+        var charIndx = Math.floor(game.getRandomRange(0, word.length));
+        if ((fromCharIndx != charIndx) && (shuffled[charIndx] == '_')) {
+          shuffled = game.replaceAt(shuffled, charIndx, letter);
+	  word = game.replaceAt(word, fromCharIndx, '$');
+	}
+      }
+    }
+    return shuffled;
+  }
+
+  // replace At index in a string
+  game.replaceAt = function(word, index, change) {
+    var asArray = word.split("");
+    asArray[index] = change;
+    return asArray.join("");
   }
 
   // attach tiles to DOM
@@ -50,11 +77,9 @@ function game(name, targetDiv) {
   // Create all the tile objects
   game.createTiles = function(word, positions) {
     var tileArray = [];
-    game.debug(0, "word.length " + word.length);
-    game.debug(0, "positions.length " + positions.length);
     for (var i = 0; i< word.length;i++) {
       letter = word[i];
-      game.debug(0, "new letter " + letter);
+      //game.debug(0, "new letter " + letter);
       tileArray.push(new tile(letter.toUpperCase(), i, positions[i])); // TODO send tile position, will be animation later
     }
     return tileArray;
@@ -67,7 +92,7 @@ function game(name, targetDiv) {
     var x =  (100 - ((tileWidth + tilePadding) * word.length)) / 2;
     var positions = [];
     positions.push(new letterPosition(x, restY));
-    for (var i = 1; i <= word.length; i++) {
+    for (var i = 1; i < word.length; i++) {
       x += tileWidth + tilePadding
       positions.push(new letterPosition(x, restY));
     }
