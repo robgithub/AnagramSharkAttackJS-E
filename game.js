@@ -45,17 +45,12 @@ function game(name, targetDiv) {
   // shuffle the letter order
   game.shuffle = function(word) {
     var shuffled = "".padStart(word.length, '_');
-    var empty = "".padStart(word.length, '$');
-    while (word != empty) {
-      var fromCharIndx = Math.floor(game.getRandomRange(0, word.length));
-      var letter = word[fromCharIndx];
-      if (letter != '$') {
-        var charIndx = Math.floor(game.getRandomRange(0, word.length));
-        if ((fromCharIndx != charIndx) && (shuffled[charIndx] == '_')) {
-          shuffled = game.replaceAt(shuffled, charIndx, letter);
-	  word = game.replaceAt(word, fromCharIndx, '$');
-	}
+    for (var i = 0; i< word.length; i++) {
+      var charIndx = Math.floor(game.getRandomRange(0, word.length));
+      while ((shuffled[charIndx] != '_') || ((charIndx == i) && (shuffled.match(/_/g).length != 1) )) {
+        charIndx = Math.floor(game.getRandomRange(0, word.length));
       }
+      shuffled = game.replaceAt(shuffled, charIndx, word[i]);
     }
     return shuffled;
   }
@@ -80,7 +75,7 @@ function game(name, targetDiv) {
     for (var i = 0; i< word.length;i++) {
       letter = word[i];
       //game.debug(0, "new letter " + letter);
-      tileArray.push(new tile(letter.toUpperCase(), i, positions[i])); // TODO send tile position, will be animation later
+      tileArray.push(new tile(letter.toUpperCase(), i, positions[i])); 
     }
     return tileArray;
   }
