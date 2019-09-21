@@ -6,16 +6,11 @@ Anagram Shark Attack JS-E
 
 */
 
-function letterPosition(x, y) {
-  var letterPosition = this;
-  letterPosition.x = x;
-  letterPosition.y = y;
-}
-
-function game(name, targetDiv) {
+function Game(name, targetDiv) {
   var game = this; 
   game.targetDiv = targetDiv; 
   var debugLevel = 0;
+  var logger = new Logger(debugLevel);
   var level = 0; // waiting to start
   var word = '';
   var tiles = [];
@@ -32,12 +27,12 @@ function game(name, targetDiv) {
 
   // Public START method
   game.start = function() {
-    game.debug(0, "it has begun");
+    logger.debug(0, "it has begun");
     level++;
     word = game.getWord(level);
     letterPositions = game.calculateLetterPositions(word);
     var shuffled = game.shuffle(word);
-    game.debug(0, "shuffled word ["+ word +"] is [" + shuffled + "]");
+    logger.debug(0, "shuffled word ["+ word +"] is [" + shuffled + "]");
     tiles = game.createTiles(word, letterPositions);
     game.attachTiles(tiles);
   }
@@ -46,9 +41,9 @@ function game(name, targetDiv) {
   game.shuffle = function(word) {
     var shuffled = "".padStart(word.length, '_');
     for (var i = 0; i< word.length; i++) {
-      var charIndx = Math.floor(game.getRandomRange(0, word.length));
+      var charIndx = Math.floor(Random.getRandomRange(0, word.length));
       while ((shuffled[charIndx] != '_') || ((charIndx == i) && (shuffled.match(/_/g).length != 1) )) {
-        charIndx = Math.floor(game.getRandomRange(0, word.length));
+        charIndx = Math.floor(Random.getRandomRange(0, word.length));
       }
       shuffled = game.replaceAt(shuffled, charIndx, word[i]);
     }
@@ -75,7 +70,7 @@ function game(name, targetDiv) {
     for (var i = 0; i< word.length;i++) {
       letter = word[i];
       //game.debug(0, "new letter " + letter);
-      tileArray.push(new tile(letter.toUpperCase(), i, positions[i])); 
+      tileArray.push(new Tile(letter.toUpperCase(), i, positions[i])); 
     }
     return tileArray;
   }
@@ -86,40 +81,25 @@ function game(name, targetDiv) {
     // 100 - (100 - ((tileX + padding)*number of letters) / 2)
     var x =  (100 - ((tileWidth + tilePadding) * word.length)) / 2;
     var positions = [];
-    positions.push(new letterPosition(x, restY));
+    positions.push(new LetterPosition(x, restY));
     for (var i = 1; i < word.length; i++) {
       x += tileWidth + tilePadding
-      positions.push(new letterPosition(x, restY));
+      positions.push(new LetterPosition(x, restY));
     }
     return positions;
   }
 
   // return a random word for the specified level
   game.getWord = function(level) {
-    return (words[level-1][Math.floor(game.getRandomRange(0, words[level-1].length))]);
+    return (words[level-1][Math.floor(Random.getRandomRange(0, words[level-1].length))]);
   };
 
-  // return random value between 0 and 1.0
-  game.getRandom = function() {
-    return Math.random();
-  };
 
-  // return random float value between min and max (including min and up to but not including the whole number max)
-  // might want to call Math.floor if the value is for an array index.
-  game.getRandomRange = function(min,max) {
-    return min + ( max * this.getRandom());
-  };
-
-  // log any debug messages that are at the threshold of debugLevel or below.
-  game.debug  = function(debugThreshold, message) {
-    if (debugLevel >= debugThreshold) {
-      console.log(message);
-    }
-  }
 
 }
 
-function tile(letter, id, pos) {
+// Title class
+function Tile(letter, id, pos) {
   var tile = this;
   tile.letter = letter;
   tile.id = id;
@@ -135,4 +115,40 @@ function tile(letter, id, pos) {
     return element;
   };
 }
+
+// Letter position class
+function LetterPosition(x, y) {
+  var letterPosition = this;
+  letterPosition.x = x;
+  letterPosition.y = y;
+}
+
+// Logger class
+function Logger(debugLevel) {
+  var logger = this;
+  debugLevel = debugLevel;
+
+  // log any debug messages that are at the threshold of debugLevel or below.
+  logger.debug = function(debugThreshold, message) {
+    if (debugLevel >= debugThreshold) {
+      console.log(message);
+    }
+  }
+}
+
+// namespaces for common functions
+
+// Random
+var Random = {
+  // return random value between 0 and 1.0
+  getRandom : function() {
+    return Math.random();
+  },
+
+  // return random float value between min and max (including min and up to but not including the whole number max)
+  // might want to call Math.floor if the value is for an array index.
+  getRandomRange : function(min,max) {
+    return min + ( max * this.getRandom());
+  },
+};
 
