@@ -15,10 +15,12 @@ function Game(name, targetDiv) {
   var word = '';
   var tiles = [];
   var words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','seacucumber','nudibranch','bobbitworm','giantclam' ] ];
-  var letterPositions = [];  // where letters can be and what state each position is
+  var tilePositions = [];  // where tiles can be and what state each position is
   var tileWidth = 5;
   var tilePadding = 2;
   var restY="100";
+  var maxTileSize = null;
+  var tileSize = null;
 
 
   game.bd = function() {
@@ -28,13 +30,28 @@ function Game(name, targetDiv) {
   // Public START method
   game.start = function() {
     logger.debug(0, "it has begun");
+    maxTileSize = game.calculateMaxTileSize();
+    tileSize = game.calculateTileSize(maxTileSize);
     level++;
     word = game.getWord(level);
-    letterPositions = game.calculateLetterPositions(word);
+    tilePositions = game.calculateTilePositions(word);
     var shuffled = game.shuffle(word);
-    logger.debug(0, "shuffled word ["+ word +"] is [" + shuffled + "]");
-    tiles = game.createTiles(word, letterPositions);
+    logger.debug(0, "The word ["+ word +"] is shuffled as [" + shuffled + "]");
+    tiles = game.createTiles(shuffled, tilePositions, tileSize);
     game.attachTiles(tiles);
+  }
+  
+  // calculate the tile size based on playarea
+  // returns a TileSize object
+  game.calculateTileSize = function(max){
+    var size = new TileSize(max,max);
+    return size; // TODO base on targeDiv size
+  }
+  
+  // calculate the maximum possible tile size based on playarea
+  // returns a single integer representing the maximum number of pixels a tile can be in height(and width)
+  game.calculateMaxTileSize = function(){
+    return 50; // TODO base on targeDiv size
   }
   
   // shuffle the letter order
@@ -65,26 +82,25 @@ function Game(name, targetDiv) {
   }
 
   // Create all the tile objects
-  game.createTiles = function(word, positions) {
+  game.createTiles = function(word, positions, tileSize) {
     var tileArray = [];
     for (var i = 0; i< word.length;i++) {
       letter = word[i];
-      //game.debug(0, "new letter " + letter);
-      tileArray.push(new Tile(letter.toUpperCase(), i, positions[i])); 
+      tileArray.push(new Tile(letter.toUpperCase(), i, positions[i], tileSize)); 
     }
     return tileArray;
   }
   
-  // where do the letters sit in space?
-  game.calculateLetterPositions = function(word) {
+  // where do the Tile sit in space?
+  game.calculateTilePositions = function(word) {
     // centering formula where 100 === 100%
     // 100 - (100 - ((tileX + padding)*number of letters) / 2)
     var x =  (100 - ((tileWidth + tilePadding) * word.length)) / 2;
     var positions = [];
-    positions.push(new LetterPosition(x, restY));
+    positions.push(new TilePosition(x, restY));
     for (var i = 1; i < word.length; i++) {
       x += tileWidth + tilePadding
-      positions.push(new LetterPosition(x, restY));
+      positions.push(new TilePosition(x, restY));
     }
     return positions;
   }
@@ -99,15 +115,18 @@ function Game(name, targetDiv) {
 }
 
 // Title class
-function Tile(letter, id, pos) {
+function Tile(letter, id, pos, size) {
   var tile = this;
   tile.letter = letter;
   tile.id = id;
+  tile.pos = pos;
+  tile.size = size;
+  tile.size = new TileSize(100,100);
   
   tile.create = function() {
     var element = document.createElement('div');
-    element.className = "tile letter-" + letter +" tile-" + tile.id + "";
-    element.setAttribute("style","left:" + pos.x + "%;top:" + pos.y + "%");
+    element.className = "tile letter-" + tile.letter +" tile-" + tile.id + "";
+    element.setAttribute("style","left:" + tile.pos.x + "%;top:" + tile.pos.y + "%;width:" + tile.size.w + "px;height:" + tile.size.h + "px");
     var innerElement = document.createElement('div');
     innerElement.className = "inner";
     innerElement.innerHTML = '<svg viewBox="0 0 100 100"><text x="18" y="90%">'+ tile.letter +'</text></svg>';
@@ -116,12 +135,20 @@ function Tile(letter, id, pos) {
   };
 }
 
-// Letter position class
-function LetterPosition(x, y) {
-  var letterPosition = this;
-  letterPosition.x = x;
-  letterPosition.y = y;
+// Tile position class
+function TilePosition(x, y) {
+  var tilePosition = this;
+  tilePosition.x = x;
+  tilePosition.y = y;
 }
+
+// Tile size class
+function TileSize(w, h) {
+  var tileSize = this;
+  tileSize.w = w;
+  tileSize.h = h;
+}
+
 
 // Logger class
 function Logger(debugLevel) {
