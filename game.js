@@ -16,8 +16,6 @@ function Game(name, targetDiv) {
   var tiles = [];
   var words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','coelacanth','nudibranch','bobbitworm','giantclam' ] ];
   var tilePositions = [];  // where tiles can be and what state each position is
-  var tileWidth = 5;
-  var tilePadding = 2;
   var restY="50"; // Resting position of the tiles, percentage
   var maxTileSize = null;
   var tileSize = null;
@@ -30,16 +28,19 @@ function Game(name, targetDiv) {
   // Public START method
   game.start = function() {
     logger.debug(0, "it has begun");
-    maxTileSize = game.calculateMaxTileSize();
-    logger.debug(1, "calculateMaxTileSize() returned [" + maxTileSize + "]");
-    tileSize = game.calculateTileSize(maxTileSize);
-    tileWidth = tileSize.w;
-    logger.debug(1, "calculateTileSize() returned [" + tileSize.w + ", " + tileSize.h + "]");
     level++;
     word = game.getWord(level);
-    tilePositions = game.calculateTilePositions(word);
     var shuffled = game.shuffle(word);
     logger.debug(0, "The word ["+ word +"] is shuffled as [" + shuffled + "]");
+    // Word has been selected and shuffled
+    var playAreaWidth = document.querySelector(game.targetDiv).getBoundingClientRect().width;
+    var tilePadding = 2; // TODO revisit, percentage of tile?
+    maxTileSize = game.calculateMaxTileSize(playAreaWidth, word.length, tilePadding);
+    logger.debug(1, "calculateMaxTileSize() returned [" + maxTileSize + "]");
+    tileSize = game.calculateTileSize(maxTileSize);
+    var tileWidth = tileSize.w;
+    logger.debug(1, "calculateTileSize() returned [" + tileSize.w + ", " + tileSize.h + "]");
+    tilePositions = game.calculateTilePositions(word, playAreaWidth, tileWidth, tilePadding);
     tiles = game.createTiles(shuffled, tilePositions, tileSize);
     game.attachTiles(tiles);
   }
@@ -54,8 +55,9 @@ function Game(name, targetDiv) {
   // calculate the maximum possible tile size based on playarea
   // returns a single integer representing the maximum number of pixels a tile can be in height(and width)
   // based on the max number of tiles per word, might change in the future
-  game.calculateMaxTileSize = function(){
-    return 50; // TODO base on targeDiv size
+  game.calculateMaxTileSize = function(playAreaWidth, wordLength, tilePadding){
+    var result = (playAreaWidth - ((wordLength + 2 + 1) * tilePadding)) / (wordLength + 2);
+    return result;
   }
   
   // shuffle the letter order
@@ -96,10 +98,7 @@ function Game(name, targetDiv) {
   }
   
   // where do the Tile sit in space?
-  game.calculateTilePositions = function(word) {
-    // centering formula where 100 === 100%
-    // 100 - (100 - ((tileX + padding)*number of letters) / 2)
-    var playAreaWidth = document.querySelector(game.targetDiv).getBoundingClientRect().width;
+  game.calculateTilePositions = function(word, playAreaWidth, tileWidth, tilePadding) {
     logger.debug(1, "calculateTilePositions() tileWidth = [" + tileWidth + "] tilePadding = [" + tilePadding + "]");
     var x = (playAreaWidth - ((tileWidth + tilePadding) * word.length)) /2;
     logger.debug(1, "calculateTilePositions() playAreaWidth = [" + playAreaWidth + "] initial x = [" + x + "]");
