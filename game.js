@@ -16,7 +16,7 @@ function Game(name, targetDiv) {
   var tiles = [];
   var words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','coelacanth','nudibranch','bobbitworm','giantclam' ] ];
   var tilePositions = [];  // where tiles can be and what state each position is
-  var restY="50"; // Resting position of the tiles, percentage
+  var restY="40"; // Resting position of the tiles, percentage
   var maxTileSize = null;
   var tileSize = null;
 
@@ -47,14 +47,14 @@ function Game(name, targetDiv) {
   
   // calculate the tile size based on playarea
   // returns a TileSize object
+  // Allows additional checks on available space after initial calculation purely on Width
   game.calculateTileSize = function(max){
-    var size = new TileSize(max,max);
+    var size = new TileSize(max, max);
     return size; // TODO base on targeDiv size
   }
   
   // calculate the maximum possible tile size based on playarea
   // returns a single integer representing the maximum number of pixels a tile can be in height(and width)
-  // based on the max number of tiles per word, might change in the future
   game.calculateMaxTileSize = function(playAreaWidth, wordLength, tilePadding){
     var result = (playAreaWidth - ((wordLength + 2 + 1) * tilePadding)) / (wordLength + 2);
     return result;
@@ -83,8 +83,19 @@ function Game(name, targetDiv) {
   // attach tiles to DOM
   game.attachTiles = function(tiles) {
     for (var i = 0; i<tiles.length;i++) {
-      document.querySelector(game.targetDiv).append(tiles[i].create());
+      var newTile = tiles[i].create();
+      newTile.hidden = true; // Start hidden before the "bob" animation
+      document.querySelector(game.targetDiv).append(newTile);
+      setTimeout(game.tileBobUp, Random.getRandomRange(100, 1000), newTile);
     }
+  }
+
+  // Bob-up tile
+  // removes the class if required before unhiding the element and applying the class
+  game.tileBobUp = function(element) {
+    element.hidden = false;
+    element.classList.remove('bob-up');
+    element.classList.add('bob-up');
   }
 
   // Create all the tile objects

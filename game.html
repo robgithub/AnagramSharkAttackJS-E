@@ -7,27 +7,28 @@
     <style type="text/css">
       body {
 	      background-color: #ffe1a3;
+        margin:0px;
       }
       #playarea {
-        width:100px;
-        height:100px;
+        width:800px;
+        height:600px;
       }
       #playarea2 {
-        width:50px;
-        height:50px;
-        left:200px;
+        width:420px;
+        height:280px;
+        left:802px;
       }
     </style>
     <link rel="stylesheet" type="text/css" href="game.css" />
   </head>
   <body>
-    <div id="playarea">lo</div>
-    <div id="playarea2">hi</div>
+    <div id="playarea">Play area 1</div>
+    <div id="playarea2">Play area 2</div>
     <script type='text/javascript'>
-      var Game = new game("Anagram Shark Attack JS-E", "#playarea");
-      Game.start();
-      var Game2 = new game("Anagram Shark Attack JS-E", "#playarea2");
-      Game2.start();
+      var game1 = new Game("Anagram Shark Attack JS-E", "#playarea");
+      game1.start();
+      var game2 = new Game("Anagram Shark Attack JS-E", "#playarea2");
+      game2.start();
     </script>
   </body>
 </html>

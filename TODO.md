@@ -14,7 +14,7 @@ CSS: placholder created
 
 Assets/components:
   Waves [X]
-  Letter Tile template [-] (basic and hardcoded)
+  Letter Tile template [X] 
   Clouds [X]
   Title [ ]
   Sonar [X]
@@ -66,8 +66,8 @@ Concentrating on the tiles;
 Game play:
   Start button [ ]
   Word selection per level [X]
-  calculate letter positions [ ]
-  animate titles to start locations [ ]
+  calculate letter positions [X]
+  animate titles to start locations [ ] - "Bob up CSS vertical animation"
   tiles draggable [ ]
   tile release -> closest column [ ]
   tile bumping [ ]
