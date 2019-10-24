@@ -5,20 +5,20 @@ Anagram Shark Attack JS-E
 2019 Rob-on-earth
 
 */
-
+'use strict';
 function Game(name, targetDiv) {
   var game = this; 
   game.targetDiv = targetDiv; 
-  var debugLevel = 0;
+  var debugLevel = 1;
   var logger = new Logger(debugLevel);
   var level = 0; // waiting to start
   var word = '';
   var tiles = [];
-  var words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','seacucumber','nudibranch','bobbitworm','giantclam' ] ];
+  var words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','coelacanth','nudibranch','bobbitworm','giantclam' ] ];
   var tilePositions = [];  // where tiles can be and what state each position is
   var tileWidth = 5;
   var tilePadding = 2;
-  var restY="100";
+  var restY="50"; // Resting position of the tiles, percentage
   var maxTileSize = null;
   var tileSize = null;
 
@@ -31,7 +31,10 @@ function Game(name, targetDiv) {
   game.start = function() {
     logger.debug(0, "it has begun");
     maxTileSize = game.calculateMaxTileSize();
+    logger.debug(1, "calculateMaxTileSize() returned [" + maxTileSize + "]");
     tileSize = game.calculateTileSize(maxTileSize);
+    tileWidth = tileSize.w;
+    logger.debug(1, "calculateTileSize() returned [" + tileSize.w + ", " + tileSize.h + "]");
     level++;
     word = game.getWord(level);
     tilePositions = game.calculateTilePositions(word);
@@ -50,6 +53,7 @@ function Game(name, targetDiv) {
   
   // calculate the maximum possible tile size based on playarea
   // returns a single integer representing the maximum number of pixels a tile can be in height(and width)
+  // based on the max number of tiles per word, might change in the future
   game.calculateMaxTileSize = function(){
     return 50; // TODO base on targeDiv size
   }
@@ -85,7 +89,7 @@ function Game(name, targetDiv) {
   game.createTiles = function(word, positions, tileSize) {
     var tileArray = [];
     for (var i = 0; i< word.length;i++) {
-      letter = word[i];
+      var letter = word[i];
       tileArray.push(new Tile(letter.toUpperCase(), i, positions[i], tileSize)); 
     }
     return tileArray;
@@ -95,7 +99,10 @@ function Game(name, targetDiv) {
   game.calculateTilePositions = function(word) {
     // centering formula where 100 === 100%
     // 100 - (100 - ((tileX + padding)*number of letters) / 2)
-    var x =  (100 - ((tileWidth + tilePadding) * word.length)) / 2;
+    var playAreaWidth = document.querySelector(game.targetDiv).getBoundingClientRect().width;
+    logger.debug(1, "calculateTilePositions() tileWidth = [" + tileWidth + "] tilePadding = [" + tilePadding + "]");
+    var x = (playAreaWidth - ((tileWidth + tilePadding) * word.length)) /2;
+    logger.debug(1, "calculateTilePositions() playAreaWidth = [" + playAreaWidth + "] initial x = [" + x + "]");
     var positions = [];
     positions.push(new TilePosition(x, restY));
     for (var i = 1; i < word.length; i++) {
@@ -121,12 +128,11 @@ function Tile(letter, id, pos, size) {
   tile.id = id;
   tile.pos = pos;
   tile.size = size;
-  tile.size = new TileSize(100,100);
   
   tile.create = function() {
     var element = document.createElement('div');
     element.className = "tile letter-" + tile.letter +" tile-" + tile.id + "";
-    element.setAttribute("style","left:" + tile.pos.x + "%;top:" + tile.pos.y + "%;width:" + tile.size.w + "px;height:" + tile.size.h + "px");
+    element.setAttribute("style","left:" + tile.pos.x + "px;top:" + tile.pos.y + "%;width:" + tile.size.w + "px;height:" + tile.size.h + "px");
     var innerElement = document.createElement('div');
     innerElement.className = "inner";
     innerElement.innerHTML = '<svg viewBox="0 0 100 100"><text x="18" y="90%">'+ tile.letter +'</text></svg>';
