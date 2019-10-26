@@ -11,29 +11,52 @@
   position: absolute;
   left: 0px;
   top: 0px;
-  height: 100%; /* box-sizing bitch! */
+  height: 100%; /* box-sizing, bitch! */
   width: 100%;
   border: 2px solid black;
   border-radius: 16%;
   background-image: linear-gradient(25deg, #aaf 50%, #f88 80%, #ffa 90%);
   box-sizing: border-box;
+  cursor:move;
 }
-
+/* Prevents inconsistent highlighting of element while being dragged
+   Copied from https://stackoverflow.com/questions/826782 */
+.no-select {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
 .inner{
   margin: 8%;
   background-color: black;
   border: 2px solid black;
   border-radius: 16%;
-  height: 76%;
+  height: 80%;
   fill:#fff;
   font-family: monospace;
   font-size: 106px;
   font-weight: bold;
 }
-
 .inner svg {
   position:absolute;
   width: 76%;
   height: 76%;
+}
+
+.bob-up {
+  animation: tile-bob-up-animation 2.5s ease-in-out;
+}
+
+@keyframes tile-bob-up-animation {
+  0%   { top: 100%; }
+  60%  { top: 20%; }
+  70%  { top: 50%; }
+  80%  { top: 35%; }
+  90%  { top: 45%; }
+  100% { top: 40%; }
 
 }
