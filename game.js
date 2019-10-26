@@ -82,10 +82,12 @@ function Game(name, targetDiv) {
 
   // attach tiles to DOM
   game.attachTiles = function(tiles) {
+    var targetDiv = document.querySelector(game.targetDiv);
     for (var i = 0; i<tiles.length;i++) {
       var newTile = tiles[i].create();
       newTile.hidden = true; // Start hidden before the "bob" animation
       document.querySelector(game.targetDiv).append(newTile);
+      new DraggableElement(newTile, targetDiv);
       setTimeout(game.tileBobUp, Random.getRandomRange(100, 1000), newTile);
     }
   }
@@ -192,15 +194,26 @@ function DraggableElement(element, draggableArea) {
     draggableElement.initateDrag(this, e);
     return false;
   }, true);
-  // start with element not being dragged until mousedown
+  // bind the touchstart event to the element we want to drag
+  draggableElement.element.addEventListener("touchstart", function (e) { 
+    draggableElement.initateDrag(this, e);
+    return false;
+  }, true);
+  // start with element not being dragged until user activity 
   draggableElement.element = null;
   
   // set the draggable element, called from the mouse down event
   draggableElement.initateDrag = function(element, e) {
     draggableElement.element = element; 
-    draggableElement.offsetLeft = e.clientX - draggableElement.element.offsetLeft;
-    draggableElement.offsetTop  = e.clientY - draggableElement.element.offsetTop;
-    draggableElement.draggableArea.addEventListener("mousemove", draggableElement.dragElement, false);
+    if (e.type=="mousedown") {
+      draggableElement.offsetLeft = e.clientX - draggableElement.element.offsetLeft;
+      draggableElement.offsetTop  = e.clientY - draggableElement.element.offsetTop;
+      draggableElement.draggableArea.addEventListener("mousemove", draggableElement.dragElement, false);
+    } else if(e.type=="touchstart") { 
+      draggableElement.offsetLeft = e.targetTouches[0].clientX - draggableElement.element.offsetLeft;
+      draggableElement.offsetTop  = e.targetTouches[0].clientY - draggableElement.element.offsetTop;
+      draggableElement.draggableArea.addEventListener("touchmove", draggableElement.dragElement, false);
+    }
   }
 
   // Drag element where ever the mouse is
@@ -208,8 +221,13 @@ function DraggableElement(element, draggableArea) {
     e.preventDefault();
     e.stopPropagation();
     if (draggableElement.element) {
-      draggableElement.element.style.left = (e.clientX - draggableElement.offsetLeft)  + 'px';
-      draggableElement.element.style.top =  (e.clientY - draggableElement.offsetTop)   + 'px';
+      if (e.type=="mousemove") {
+        draggableElement.element.style.left = (e.clientX - draggableElement.offsetLeft)  + 'px';
+        draggableElement.element.style.top =  (e.clientY - draggableElement.offsetTop)   + 'px';
+      } else if(e.type=="touchmove") { 
+        draggableElement.element.style.left = (e.targetTouches[0].clientX - draggableElement.offsetLeft)  + 'px';
+        draggableElement.element.style.top =  (e.targetTouches[0].clientY - draggableElement.offsetTop)   + 'px';
+      }
     }
   }
 
@@ -219,12 +237,15 @@ function DraggableElement(element, draggableArea) {
     e.stopPropagation();
     if (draggableElement.element) {
       draggableElement.draggableArea.removeEventListener("mousemove", draggableElement.dragElement);
+      draggableElement.draggableArea.removeEventListener("touchmove", draggableElement.dragElement);
       draggableElement.element = null;
     }
   }
 
   draggableElement.draggableArea.addEventListener("mouseup", draggableElement.stopDrag, false);
   draggableElement.draggableArea.addEventListener("mouseleave", draggableElement.stopDrag, false);
+  draggableElement.draggableArea.addEventListener("touchend", draggableElement.stopDrag, false);
+  draggableElement.draggableArea.addEventListener("touchcancel", draggableElement.stopDrag, false);
 }
 
 
