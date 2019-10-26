@@ -141,7 +141,7 @@ function Tile(letter, id, pos, size) {
   
   tile.create = function() {
     var element = document.createElement('div');
-    element.className = "tile letter-" + tile.letter +" tile-" + tile.id + "";
+    element.className = "tile no-select letter-" + tile.letter +" tile-" + tile.id + "";
     element.setAttribute("style","left:" + tile.pos.x + "px;top:" + tile.pos.y + "%;width:" + tile.size.w + "px;height:" + tile.size.h + "px");
     var innerElement = document.createElement('div');
     innerElement.className = "inner";
@@ -179,7 +179,59 @@ function Logger(debugLevel) {
   }
 }
 
+// DraggableElement class
+// where draggableArea is the element the dragging will occur in
+function DraggableElement(element, draggableArea) {
+  var draggableElement = this;
+  draggableElement.element = element;
+  draggableElement.draggableArea = draggableArea;
+  draggableElement.offsetLeft = 0;
+  draggableElement.offsetTop = 0;
+  // bind the mousedown event to the element we want to drag
+  draggableElement.element.addEventListener("mousedown", function (e) { 
+    draggableElement.initateDrag(this, e);
+    return false;
+  }, true);
+  // start with element not being dragged until mousedown
+  draggableElement.element = null;
+  
+  // set the draggable element, called from the mouse down event
+  draggableElement.initateDrag = function(element, e) {
+    draggableElement.element = element; 
+    draggableElement.offsetLeft = e.clientX - draggableElement.element.offsetLeft;
+    draggableElement.offsetTop  = e.clientY - draggableElement.element.offsetTop;
+    draggableElement.draggableArea.addEventListener("mousemove", draggableElement.dragElement, false);
+  }
+
+  // Drag element where ever the mouse is
+  draggableElement.dragElement = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggableElement.element) {
+      draggableElement.element.style.left = (e.clientX - draggableElement.offsetLeft)  + 'px';
+      draggableElement.element.style.top =  (e.clientY - draggableElement.offsetTop)   + 'px';
+    }
+  }
+
+  // Stop dragging element
+  draggableElement.stopDrag = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggableElement.element) {
+      draggableElement.draggableArea.removeEventListener("mousemove", draggableElement.dragElement);
+      draggableElement.element = null;
+    }
+  }
+
+  draggableElement.draggableArea.addEventListener("mouseup", draggableElement.stopDrag, false);
+  draggableElement.draggableArea.addEventListener("mouseleave", draggableElement.stopDrag, false);
+}
+
+
 // namespaces for common functions
+
+
+
 
 // Random
 var Random = {

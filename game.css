@@ -17,6 +17,18 @@
   border-radius: 16%;
   background-image: linear-gradient(25deg, #aaf 50%, #f88 80%, #ffa 90%);
   box-sizing: border-box;
+  cursor:move;
+}
+/* Prevents inconsistent highlighting of element while being dragged
+   Copied from https://stackoverflow.com/questions/826782 */
+.no-select {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
 }
 .inner{
   margin: 8%;
