@@ -228,6 +228,7 @@ function DraggableElement(element, draggableArea) {
         draggableElement.element.style.left = (e.targetTouches[0].clientX - draggableElement.offsetLeft)  + 'px';
         draggableElement.element.style.top =  (e.targetTouches[0].clientY - draggableElement.offsetTop)   + 'px';
       }
+      draggableElement.element.style.zIndex=100;
     }
   }
 
@@ -236,6 +237,7 @@ function DraggableElement(element, draggableArea) {
     e.preventDefault();
     e.stopPropagation();
     if (draggableElement.element) {
+      draggableElement.element.style.zIndex=1;
       draggableElement.draggableArea.removeEventListener("mousemove", draggableElement.dragElement);
       draggableElement.draggableArea.removeEventListener("touchmove", draggableElement.dragElement);
       draggableElement.element = null;
