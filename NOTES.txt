@@ -1,0 +1,11 @@
+Notes to myself
+
+So I have a dragged Tile marked as userDropped == true and picked up in my animation loop.
+I need to detail where to animate FROM and TO and how much to animate in a given time frame.
+The FROM is easy as it is just the current Tile loation - how is this set?
+The TO is two values the column closest and the height the Tile should align too. I think this should be either the current height or a percentage below it.
+The amount is a bit more complicated. I can record the initial time the animation started and then get the exact timestamp each time a frame is called.
+Math will then create a 0.0-1.0 value that is the distance over speed.
+Set the flag userDropped = false
+
+Once the tile has been animated to its correct location that may have bumpped 1 or more other Tiles. 

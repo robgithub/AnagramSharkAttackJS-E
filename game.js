@@ -7,42 +7,80 @@ Anagram Shark Attack JS-E
 */
 'use strict';
 function Game(name, targetDiv) {
-  var game = this; 
-  game.targetDiv = targetDiv; 
-  var debugLevel = 1;
-  var logger = new Logger(debugLevel);
+  // "name" is not currently used in any way, could be title text
+  var game = this; // our instance
+  game.targetDiv = targetDiv; // save the targetDiv as passed to the Game by the initialisation code
+  var debugLevel = 1; // only show debug messages to this depth
+  var logger = new Logger(debugLevel); // create an instance of the Logger class to do logging
   var level = 0; // waiting to start
-  var word = '';
-  var tiles = [];
+  var word = ''; // the current word for the level
+  var tiles = []; // all the tile instances
+  // TODO:: set as const if possible
   var words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','coelacanth','nudibranch','bobbitworm','giantclam' ] ];
   var tilePositions = [];  // where tiles can be and what state each position is
   var restY="40"; // Resting position of the tiles, percentage
-  var maxTileSize = null;
-  var tileSize = null;
+  var maxTileSize = null; // to be calculated
+  var tileSize = null; // to be calculated
 
-
-  game.bd = function() {
+  // example debug to return the instance of a tiles, otherwise everything is private
+  // example when code running game1.surfaceTiles();
+  game.surfaceTiles = function() {
     return tiles;
+  }
+  game.surfaceTilePositions = function() {
+    return tilePositions;
   }
 
   // Public START method
   game.start = function() {
     logger.debug(0, "it has begun");
-    level++;
-    word = game.getWord(level);
-    var shuffled = game.shuffle(word);
+    level++; // move from level=0 to level=1
+    word = game.getWord(level); // get the random word from the requested level, higher the level the longer the words get
+    var shuffled = game.shuffle(word); // create a shuffled version of the word ready to be descrambled
     logger.debug(0, "The word ["+ word +"] is shuffled as [" + shuffled + "]");
     // Word has been selected and shuffled
-    var playAreaWidth = document.querySelector(game.targetDiv).getBoundingClientRect().width;
-    var tilePadding = 2; // TODO revisit, percentage of tile?
-    maxTileSize = game.calculateMaxTileSize(playAreaWidth, word.length, tilePadding);
+    var playAreaWidth = document.querySelector(game.targetDiv).getBoundingClientRect().width; // Get the play area to determine the Tile size
+    var tilePadding = 2; // TODO:: revisit, percentage of tile?
+    maxTileSize = game.calculateMaxTileSize(playAreaWidth, word.length, tilePadding); // based on play area, word length and tile padding, work out the maximum possible tile size
     logger.debug(1, "calculateMaxTileSize() returned [" + maxTileSize + "]");
-    tileSize = game.calculateTileSize(maxTileSize);
-    var tileWidth = tileSize.w;
+    tileSize = game.calculateTileSize(maxTileSize); // from the maximum tile size determine the best actuall size.
+    var tileWidth = tileSize.w; // TODO:: why are we creating a new variable?
     logger.debug(1, "calculateTileSize() returned [" + tileSize.w + ", " + tileSize.h + "]");
-    tilePositions = game.calculateTilePositions(word, playAreaWidth, tileWidth, tilePadding);
-    tiles = game.createTiles(shuffled, tilePositions, tileSize);
-    game.attachTiles(tiles);
+    tilePositions = game.calculateTilePositions(word, playAreaWidth, tileWidth, tilePadding); // locate the physical tile positions for the Tiles - this is then the list of possible position that Tiles should conform to.
+    tiles = game.createTiles(shuffled, tilePositions, tileSize); // create the Tile objects from the shuffled word, the tile positions and the tileSize
+    game.attachTiles(tiles); // Attach the Tile divs to the draggable area and assign the draggable events to the tiles. Also adds the initial startup Bob animation, via random delay
+    // create game loop
+    game.animate();
+  }
+  
+  // Game animation loop
+  game.animate = function(timeStamp) {
+    // check if any objects need animating
+    const animatableTiles = tiles.filter(x => x.userDropped);
+    animatableTiles.forEach(function(tile) {
+        if (tile.animation.timeStampStart == 0) {
+            tile.animation.timeStampStart = timeStamp; // record the initial frame the animation starts
+            tile.animation.duration = 2 * 1000; // 2 seconds
+            tile.animation.fromPosition = {x:tile.element.style.left.slice(0,-2), y:tile.element.style.top.slice(0,-2)}; // record the start position as numbers
+            // TODO:: calcuate the correct end position
+            tile.animation.toPosition = {x:"10", y:"100"}; // record the destination position
+        } else {
+            // we have work to do.
+            let timeFraction = (timeStamp - tile.animation.timeStampStart) / tile.animation.duration;
+            if (timeFraction > 1) { 
+                timeFraction = 1;
+                tile.userDropped = false; // we have reached our destination
+                tile.animation.timeStampStart = 0;
+            } else{
+                // timeFraction is the value between 0.0 - 1.0 that defines the progress of the animation, so 0.5 is half way.
+                // Move the tile
+                tile.element.style.top = (tile.animation.toPosition.y * timeFraction) + 'px';
+            }
+            logger.debug(0, "Tile["+ tile.letter +"]timeFraction = " + timeFraction);
+        }
+    });
+    //logger.debug(0, "length of animatable tiles "+ animatableTiles.length);
+    requestAnimationFrame(game.animate);
   }
   
   // calculate the tile size based on playarea
@@ -80,14 +118,15 @@ function Game(name, targetDiv) {
     return asArray.join("");
   }
 
-  // attach tiles to DOM
+  // attach tiles to DOM as draggable elements
   game.attachTiles = function(tiles) {
     var targetDiv = document.querySelector(game.targetDiv);
     for (var i = 0; i<tiles.length;i++) {
       var newTile = tiles[i].create();
+      tiles[i].element = newTile;
       newTile.hidden = true; // Start hidden before the "bob" animation
       document.querySelector(game.targetDiv).append(newTile);
-      new DraggableElement(newTile, targetDiv);
+      new DraggableElement(newTile, targetDiv, tiles[i]);
       setTimeout(game.tileBobUp, Random.getRandomRange(100, 1000), newTile);
     }
   }
@@ -140,6 +179,10 @@ function Tile(letter, id, pos, size) {
   tile.id = id;
   tile.pos = pos;
   tile.size = size;
+  tile.userDropped = false;
+  // TODO:: make this reusable animation class
+  tile.animation = {timeStampStart:0, duration:0, fromPosition:{x:0, y:0}, toPosition:{x:0, y:0}};
+  tile.element = null;
   
   tile.create = function() {
     var element = document.createElement('div');
@@ -183,12 +226,15 @@ function Logger(debugLevel) {
 
 // DraggableElement class
 // where draggableArea is the element the dragging will occur in
-function DraggableElement(element, draggableArea) {
+function DraggableElement(element, draggableArea, tile) {
   var draggableElement = this;
   draggableElement.element = element;
   draggableElement.draggableArea = draggableArea;
   draggableElement.offsetLeft = 0;
   draggableElement.offsetTop = 0;
+  draggableElement.tile = tile; // instance of the tile that is draggable. Makes this class non-longer tile object agnostic, but required to able to get at the tilte specific attrributes. 
+  // TODO::Could be refactored with events so we do not touch the tile attributes?
+  
   // bind the mousedown event to the element we want to drag
   draggableElement.element.addEventListener("mousedown", function (e) { 
     draggableElement.initateDrag(this, e);
@@ -228,7 +274,8 @@ function DraggableElement(element, draggableArea) {
         draggableElement.element.style.left = (e.targetTouches[0].clientX - draggableElement.offsetLeft)  + 'px';
         draggableElement.element.style.top =  (e.targetTouches[0].clientY - draggableElement.offsetTop)   + 'px';
       }
-      draggableElement.element.style.zIndex=100;
+      draggableElement.element.style.zIndex=100; // TODO:: revisit the z-index once we have waves etc
+      draggableElement.tile.userDropped = false;
     }
   }
 
@@ -237,10 +284,11 @@ function DraggableElement(element, draggableArea) {
     e.preventDefault();
     e.stopPropagation();
     if (draggableElement.element) {
-      draggableElement.element.style.zIndex=1;
+      draggableElement.element.style.zIndex=1; // TODO:: revisit the z-index once we have waves etc - this does not produce a clear "last" item in the correct z-index
       draggableElement.draggableArea.removeEventListener("mousemove", draggableElement.dragElement);
       draggableElement.draggableArea.removeEventListener("touchmove", draggableElement.dragElement);
       draggableElement.element = null;
+      draggableElement.tile.userDropped = true; // main animation loop will identify a tile that needs to be animated to its nearest column position
     }
   }
 
