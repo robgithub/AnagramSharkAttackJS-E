@@ -21,6 +21,7 @@ function Game(name, targetDiv) {
   var restY=40; // Resting position of the tiles, percentage
   var maxTileSize = null; // to be calculated
   var tileSize = null; // to be calculated
+  const baseTileZIndex = 10;
 
   // example debug to return the instance of a tiles, otherwise everything is private
   // example when code running game1.surfaceTiles();
@@ -63,9 +64,10 @@ function Game(name, targetDiv) {
             tile.animation.duration = 2 * 1000; // 2 seconds
             tile.animation.fromPosition = {x:parseFloat(tile.element.style.left.slice(0,-2)), y:parseFloat(tile.element.style.top.slice(0,-2))}; // record the start position as numbers
             tile.animation.toPosition = game.getClosestTilePosition(tilePositions, tile.animation.fromPosition.x, restY, tileSize);
-            // TODO:: calculate the distance to the toPosition, as this is the path we want to animate.
+            // calculate the distance to the toPosition, as this is the path we want to animate.
             tile.animation.toDistance.x = tile.animation.toPosition.x - tile.animation.fromPosition.x;
             tile.animation.toDistance.y = tile.animation.toPosition.y - tile.animation.fromPosition.y;
+            game.orderTiles(tiles, tile);
         } else {
             // we have work to do.
             let timeFraction = (timeStamp - tile.animation.timeStampStart) / tile.animation.duration;
@@ -84,6 +86,20 @@ function Game(name, targetDiv) {
     });
     //logger.debug(0, "length of animatable tiles "+ animatableTiles.length);
     requestAnimationFrame(game.animate);
+  }
+  
+  // set CSS z-index for new tile ordering
+  // to be called during requestAnimationFrame
+  game.orderTiles = function(tiles, topTile) {
+    let total = tiles.length;
+    let oldZ = topTile.element.style.zIndex;
+    tiles.forEach(function(tile) {
+        if (tile.element.style.zIndex > oldZ) {
+            tile.element.style.zIndex--;
+        } else if (tile.element.style.zIndex == oldZ) {
+            tile.element.style.zIndex = baseTileZIndex + total;
+        }
+    });
   }
   
   // calculate the tile size based on playarea
@@ -147,7 +163,7 @@ function Game(name, targetDiv) {
     var tileArray = [];
     for (var i = 0; i< word.length;i++) {
       var letter = word[i];
-      tileArray.push(new Tile(letter.toUpperCase(), i, positions[i], tileSize)); 
+      tileArray.push(new Tile(letter.toUpperCase(), i, positions[i], tileSize, baseTileZIndex + i)); 
     }
     return tileArray;
   }
@@ -201,7 +217,7 @@ function Game(name, targetDiv) {
 }
 
 // Title class
-function Tile(letter, id, pos, size) {
+function Tile(letter, id, pos, size, zIndex) {
   var tile = this;
   tile.letter = letter;
   tile.id = id;
@@ -216,6 +232,7 @@ function Tile(letter, id, pos, size) {
     var element = document.createElement('div');
     element.className = "tile no-select letter-" + tile.letter +" tile-" + tile.id + "";
     element.setAttribute("style","left:" + tile.pos.x + "px;top:" + tile.pos.y + "px;width:" + tile.size.w + "px;height:" + tile.size.h + "px");
+    element.style.zIndex = zIndex;
     var innerElement = document.createElement('div');
     innerElement.className = "inner";
     innerElement.innerHTML = '<svg viewBox="0 0 100 100"><text x="18" y="90%">'+ tile.letter +'</text></svg>';
@@ -302,7 +319,7 @@ function DraggableElement(element, draggableArea, tile) {
         draggableElement.element.style.left = (e.targetTouches[0].clientX - draggableElement.offsetLeft)  + 'px';
         draggableElement.element.style.top =  (e.targetTouches[0].clientY - draggableElement.offsetTop)   + 'px';
       }
-      draggableElement.element.style.zIndex=100; // TODO:: revisit the z-index once we have waves etc
+      draggableElement.element.style.zIndex = 100; // when dragging always on top, ordering happens when the tile is dropped
       draggableElement.tile.userDropped = false;
       draggableElement.tile.animation.timeStampStart = 0;
     }
@@ -313,7 +330,6 @@ function DraggableElement(element, draggableArea, tile) {
     e.preventDefault();
     e.stopPropagation();
     if (draggableElement.element) {
-      draggableElement.element.style.zIndex=1; // TODO:: revisit the z-index once we have waves etc - this does not produce a clear "last" item in the correct z-index
       draggableElement.draggableArea.removeEventListener("mousemove", draggableElement.dragElement);
       draggableElement.draggableArea.removeEventListener("touchmove", draggableElement.dragElement);
       draggableElement.element = null;

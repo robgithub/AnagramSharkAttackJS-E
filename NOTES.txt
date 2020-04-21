@@ -12,9 +12,19 @@ Check which of the X values is closest.
 lowest value of Math.max(pos[i], x) - Math.min(pos[i], x)
 this has to be expanded to the tile width
 
-
 The amount is a bit more complicated. I can record the initial time the animation started and then get the exact timestamp each time a frame is called.
 Math will then create a 0.0-1.0 value that is the distance over speed.
 Set the flag userDropped = false
 
+Set z-order to allow last dropped title to be above other tiles
+initially all tiles are numbered in order of creation
+1234
+if I drag tile 3 then tile 4 should become z-index 3 and the dragged tile should become z-index 4
+if I then drag tile 1 it should become z-index 4 and all the rest are lowered by 1
+Where can I do this z-index reordering?
+do it the moment a animation is requested.
+and set a super z-index when dragging starts
+
 Once the tile has been animated to its correct location, that may have bumpped 1 or more other Tiles. 
+
+
