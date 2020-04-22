@@ -111,6 +111,7 @@ function Game(name, targetDiv) {
                 tile.gameBumped = false; // we have reached our destination
                 tile.animation.timeStampStart = 0; // for future instances
                 game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
+                game.orderTiles(tiles, tile);
             } 
         }
     });
@@ -168,13 +169,28 @@ function Game(name, targetDiv) {
   game.orderTiles = function(tiles, topTile) {
     let total = tiles.length;
     let oldZ = topTile.element.style.zIndex;
-    tiles.forEach(function(tile) {
-        if (tile.element.style.zIndex > oldZ) {
-            tile.element.style.zIndex--;
-        } else if (tile.element.style.zIndex == oldZ) {
-            tile.element.style.zIndex = baseTileZIndex + total;
-        }
+    // set topTile = 100 and then at the end set to baseTileZIndex + tiles.length
+    topTile.element.style.zIndex = 100;
+    // order the tiles by zIndex and check for dupes - if dupe cascade change, as they are in order
+    tiles.sort(function(a, b){
+        return b.element.style.zIndex-a.element.style.zIndex
     });
+    let last = -1;
+    tiles.forEach(function(tile) {
+        let wasZ = tile.element.style.zIndex;
+        //if (tile !==  topTile) {
+            if (tile.element.style.zIndex >= last) {
+                tile.element.style.zIndex--;
+            }
+            if (tile.element.style.zIndex == baseTileZIndex + total) {
+                tile.element.style.zIndex--;
+            }
+            last = tile.element.style.zIndex;
+        //}
+        tile.element.querySelector(".debug-z-index").innerHTML = tile.element.style.zIndex + " (" + wasZ +")";
+    });
+    topTile.element.style.zIndex = baseTileZIndex + total;
+    topTile.element.querySelector(".debug-z-index").innerHTML = "TT" + topTile.element.style.zIndex + " (" + oldZ +")";
   }
   
   // calculate the tile size based on playarea
@@ -332,6 +348,10 @@ function Tile(letter, id, pos, size, zIndex) {
     innerElement.className = "inner";
     innerElement.innerHTML = '<svg viewBox="0 0 100 100"><text x="18" y="90%">'+ tile.letter +'</text></svg>';
     element.append(innerElement);
+    var debugZIndex = document.createElement('span');
+    debugZIndex.innerHTML = zIndex;
+    debugZIndex.className = "debug-z-index";
+    element.append(debugZIndex);
     return element;
   };
 }
@@ -416,6 +436,7 @@ function DraggableElement(element, draggableArea, tile) {
         draggableElement.element.style.top =  (e.targetTouches[0].clientY - draggableElement.offsetTop)   + 'px';
       }
       draggableElement.element.style.zIndex = 100; // when dragging always on top, ordering happens when the tile is dropped
+      draggableElement.element.querySelector(".debug-z-index").innerHTML = draggableElement.element.style.zIndex;
       draggableElement.tile.userDropped = false;
       draggableElement.tile.animation.timeStampStart = 0;
     }

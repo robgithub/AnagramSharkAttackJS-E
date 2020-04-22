@@ -38,3 +38,4 @@ also the orderTiles for bumps is not working - rare edge case - not sure what is
 grab should cancel bump- fixed
 Got rid of lots of dupe code that was added to ensure Tile Width was taken into account, but was totally unneeded.
 There was a rounding issue. The size of the play area causing the distance between tiles to differ.
+orderTiles is not creating consistent sequences, had fun adding a debug class showing the z-index in real time to understand
