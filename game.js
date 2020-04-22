@@ -94,6 +94,7 @@ function Game(name, targetDiv) {
         // this is animatable tile has it got a timeStampStart yet?
         if (tile.animation.timeStampStart == 0) {
             tile.animation.timeStampStart = timeStamp; // record the initial frame the animation starts
+            game.orderTiles(tiles, tile);
             // all the other parameters are set in the bumpTiles function
         } else { // TODO::CODE SMELL - DUPLICATE CODE
             // we have work to do.
@@ -111,7 +112,6 @@ function Game(name, targetDiv) {
                 tile.gameBumped = false; // we have reached our destination
                 tile.animation.timeStampStart = 0; // for future instances
                 game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
-                game.orderTiles(tiles, tile);
             } 
         }
     });
@@ -137,9 +137,8 @@ function Game(name, targetDiv) {
                 if (tile !== masterTile){
                     // found a tile that needs animating
                     // find nearest hole
-                    // set up animation to it
+                    // set up animation towards it
                     tile.animation.duration = 2 * 1000; // 2 seconds
-                    game.orderTiles(tiles, tile);
                     tile.animation.fromPosition = {x:parseFloat(tile.element.style.left.slice(0,-2)), y:parseFloat(tile.element.style.top.slice(0,-2))}; // record the start position as numbers
                     tile.animation.toPosition = game.getClosestTilePosition(tilePositions, tile.animation.fromPosition.x, restY, tileSize, tile.animation.fromPosition, holes);
                     tile.animation.toDistance.x = tile.animation.toPosition.x - tile.animation.fromPosition.x;
@@ -167,30 +166,16 @@ function Game(name, targetDiv) {
   // set CSS z-index for new tile ordering
   // to be called during requestAnimationFrame
   game.orderTiles = function(tiles, topTile) {
-    let total = tiles.length;
-    let oldZ = topTile.element.style.zIndex;
-    // set topTile = 100 and then at the end set to baseTileZIndex + tiles.length
-    topTile.element.style.zIndex = 100;
-    // order the tiles by zIndex and check for dupes - if dupe cascade change, as they are in order
+    let tileZMax = baseTileZIndex + tiles.length;
+    topTile.element.style.zIndex = tileZMax+1; // this is magic
     tiles.sort(function(a, b){
-        return b.element.style.zIndex-a.element.style.zIndex
+        return b.element.style.zIndex-a.element.style.zIndex; // sort largest to smallest
     });
-    let last = -1;
+    let current = tileZMax;
     tiles.forEach(function(tile) {
-        let wasZ = tile.element.style.zIndex;
-        //if (tile !==  topTile) {
-            if (tile.element.style.zIndex >= last) {
-                tile.element.style.zIndex--;
-            }
-            if (tile.element.style.zIndex == baseTileZIndex + total) {
-                tile.element.style.zIndex--;
-            }
-            last = tile.element.style.zIndex;
-        //}
-        tile.element.querySelector(".debug-z-index").innerHTML = tile.element.style.zIndex + " (" + wasZ +")";
+            tile.element.style.zIndex = current;
+            current--;
     });
-    topTile.element.style.zIndex = baseTileZIndex + total;
-    topTile.element.querySelector(".debug-z-index").innerHTML = "TT" + topTile.element.style.zIndex + " (" + oldZ +")";
   }
   
   // calculate the tile size based on playarea
@@ -348,10 +333,6 @@ function Tile(letter, id, pos, size, zIndex) {
     innerElement.className = "inner";
     innerElement.innerHTML = '<svg viewBox="0 0 100 100"><text x="18" y="90%">'+ tile.letter +'</text></svg>';
     element.append(innerElement);
-    var debugZIndex = document.createElement('span');
-    debugZIndex.innerHTML = zIndex;
-    debugZIndex.className = "debug-z-index";
-    element.append(debugZIndex);
     return element;
   };
 }
@@ -436,7 +417,6 @@ function DraggableElement(element, draggableArea, tile) {
         draggableElement.element.style.top =  (e.targetTouches[0].clientY - draggableElement.offsetTop)   + 'px';
       }
       draggableElement.element.style.zIndex = 100; // when dragging always on top, ordering happens when the tile is dropped
-      draggableElement.element.querySelector(".debug-z-index").innerHTML = draggableElement.element.style.zIndex;
       draggableElement.tile.userDropped = false;
       draggableElement.tile.animation.timeStampStart = 0;
     }
