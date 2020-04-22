@@ -8,6 +8,7 @@ Anagram Shark Attack JS-E
 'use strict';
 function Game(name, targetDiv) {
   // "name" is not currently used in any way, could be title text
+  // TODO:: review var const and let
   var game = this; // our instance
   game.targetDiv = targetDiv; // save the targetDiv as passed to the Game by the initialisation code
   var debugLevel = 1; // only show debug messages to this depth
@@ -57,8 +58,9 @@ function Game(name, targetDiv) {
   // Game animation loop
   game.animate = function(timeStamp) {
     // check if any objects need animating
-    const animatableTiles = tiles.filter(x => x.userDropped);
+    let animatableTiles = tiles.filter(x => x.userDropped);
     animatableTiles.forEach(function(tile) {
+        // this is animatable tile has it got a timeStampStart yet?
         if (tile.animation.timeStampStart == 0) {
             tile.animation.timeStampStart = timeStamp; // record the initial frame the animation starts
             tile.animation.duration = 2 * 1000; // 2 seconds
@@ -70,22 +72,95 @@ function Game(name, targetDiv) {
             game.orderTiles(tiles, tile);
         } else {
             // we have work to do.
-            let timeFraction = (timeStamp - tile.animation.timeStampStart) / tile.animation.duration;
+            let timeFraction = (timeStamp - tile.animation.timeStampStart) / tile.animation.duration; 
             if (timeFraction > 1) { 
-                timeFraction = 1;
-                tile.userDropped = false; // we have reached our destination
-                tile.animation.timeStampStart = 0;
+                timeFraction = 1; // cannot go beyond the animation end
             } 
             // timeFraction is the value between 0.0 - 1.0 that defines the progress of the animation, so 0.5 is half way.
             // Move the tile
             logger.debug(3, "Tile["+ tile.letter +"] current left [" + tile.element.style.left + "] From.x [" + tile.animation.fromPosition.x + "] + calculated increase = [" + (tile.animation.toDistance.x * timeFraction)+ "] new value [" + (tile.animation.fromPosition.x + (tile.animation.toDistance.x * timeFraction)) + "]");
             tile.element.style.left = (tile.animation.fromPosition.x + (tile.animation.toDistance.x * timeFraction)) + 'px';
             tile.element.style.top  = (tile.animation.fromPosition.y + (tile.animation.toDistance.y * timeFraction)) + 'px';
-            logger.debug(0, "Tile["+ tile.letter +"]timeFraction = " + timeFraction);
+            logger.debug(3, "Tile["+ tile.letter +"]timeFraction = " + timeFraction);
+            if ( timeFraction == 1 ) {
+                tile.userDropped = false; // we have reached our destination
+                tile.animation.timeStampStart = 0; // for future instances
+                game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
+            } 
+        }
+    });
+    animatableTiles = tiles.filter(x => x.gameBumped);
+    animatableTiles.forEach(function(tile) {
+        // this is animatable tile has it got a timeStampStart yet?
+        if (tile.animation.timeStampStart == 0) {
+            tile.animation.timeStampStart = timeStamp; // record the initial frame the animation starts
+            // all the other parameters are set in the bumpTiles function
+        } else { // TODO::CODE SMELL - DUPLICATE CODE
+            // we have work to do.
+            let timeFraction = (timeStamp - tile.animation.timeStampStart) / tile.animation.duration; 
+            if (timeFraction > 1) { 
+                timeFraction = 1; // cannot go beyond the animation end
+            } 
+            // timeFraction is the value between 0.0 - 1.0 that defines the progress of the animation, so 0.5 is half way.
+            // Move the tile
+            logger.debug(3, "Bump Tile["+ tile.letter +"] current left [" + tile.element.style.left + "] From.x [" + tile.animation.fromPosition.x + "] + calculated increase = [" + (tile.animation.toDistance.x * timeFraction)+ "] new value [" + (tile.animation.fromPosition.x + (tile.animation.toDistance.x * timeFraction)) + "]");
+            tile.element.style.left = (tile.animation.fromPosition.x + (tile.animation.toDistance.x * timeFraction)) + 'px';
+            tile.element.style.top  = (tile.animation.fromPosition.y + (tile.animation.toDistance.y * timeFraction)) + 'px';
+            logger.debug(3, "Bump Tile["+ tile.letter +"]timeFraction = " + timeFraction);
+            if ( timeFraction == 1 ) {
+                tile.gameBumped = false; // we have reached our destination
+                tile.animation.timeStampStart = 0; // for future instances
+                game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
+            } 
         }
     });
     //logger.debug(0, "length of animatable tiles "+ animatableTiles.length);
     requestAnimationFrame(game.animate);
+  }
+  
+  // bump co-existing tiles to cloest empties, or at least create the animations
+  game.bumpTiles = function(tiles, tilePositions, masterTile, tileSize) {
+    // FYI masterTileile is not to be bumped as each position is a FIFO queue.
+    // need an array of possible holes before being able to determine who can go where
+    let holes = [];
+    tilePositions.forEach(function(tilePosition) {
+        let tilesAtPosition = game.tilesAtPosition(tiles, tilePosition);
+        if (tilesAtPosition.length == 0) {
+            holes.push(tilePosition); // no tiles here, its a hole!
+        } 
+    });
+    tilePositions.forEach(function(tilePosition) {
+        let tilesAtPosition = game.tilesAtPosition(tiles, tilePosition);
+        if (tilesAtPosition.length > 1) { 
+            tilesAtPosition.forEach(function(tile) {
+                if (tile !== masterTile){
+                    // found a tile that needs animating
+                    // find nearest hole
+                    // set up animation to it
+                    tile.animation.duration = 2 * 1000; // 2 seconds
+                    game.orderTiles(tiles, tile);
+                    tile.animation.fromPosition = {x:parseFloat(tile.element.style.left.slice(0,-2)), y:parseFloat(tile.element.style.top.slice(0,-2))}; // record the start position as numbers
+                    tile.animation.toPosition = game.getClosestTilePosition(tilePositions, tile.animation.fromPosition.x, restY, tileSize, tile.animation.fromPosition, holes);
+                    tile.animation.toDistance.x = tile.animation.toPosition.x - tile.animation.fromPosition.x;
+                    tile.animation.toDistance.y = tile.animation.toPosition.y - tile.animation.fromPosition.y;
+                    tile.gameBumped = true; // will get picked up in the next animation frame
+                }
+            });
+        }
+    });
+
+  }
+  
+  // check how many tiles at this position
+  game.tilesAtPosition = function(tiles, tilePosition) {
+    let tilesAtPosition = [];
+    tiles.forEach(function(tile) {
+      let tilesPosition = {x:parseFloat(tile.element.style.left.slice(0,-2)), y:parseFloat(tile.element.style.top.slice(0,-2))}; // get rid of all those nasty pixels(px)
+      if ( (tilePosition.x == tilesPosition.x) && (tilePosition.y == tilesPosition.y) ) {
+        tilesAtPosition.push(tile);
+      }
+    });
+    return tilesAtPosition;
   }
   
   // set CSS z-index for new tile ordering
@@ -130,7 +205,7 @@ function Game(name, targetDiv) {
     return shuffled;
   }
 
-  // replace At index in a string
+  // replace character at index in a string
   game.replaceAt = function(word, index, change) {
     var asArray = word.split("");
     asArray[index] = change;
@@ -150,7 +225,7 @@ function Game(name, targetDiv) {
     }
   }
 
-  // Bob-up tile
+  // Bob-up tile - CSS animation
   // removes the class if required before unhiding the element and applying the class
   game.tileBobUp = function(element) {
     element.hidden = false;
@@ -168,37 +243,56 @@ function Game(name, targetDiv) {
     return tileArray;
   }
   
-  // where do the Tile sit in space?
+  // where do the Tiles sit in space?
   game.calculateTilePositions = function(word, playArea, tileWidth, tilePadding) {
     logger.debug(1, "calculateTilePositions() tileWidth = [" + tileWidth + "] tilePadding = [" + tilePadding + "]");
     var x = (playArea.width - ((tileWidth + tilePadding) * word.length)) /2;
     logger.debug(1, "calculateTilePositions() playArea.width = [" + playArea.width + "] initial x = [" + x + "]");
     var positions = [];
-    positions.push(new TilePosition(x, (restY / 100) * playArea.height )); 
+    positions.push(new TilePosition(Math.round(x), Math.round( (restY / 100) * playArea.height ))); 
     for (var i = 1; i < word.length; i++) {
       x += tileWidth + tilePadding
-      positions.push(new TilePosition(x, (restY / 100) * playArea.height ));
+      positions.push(new TilePosition(Math.round(x), Math.round((restY / 100) * playArea.height) ));
     }
     return positions;
   }
   
   // Get the closest in Horizontal plane tile position
-  // for animtating tile drops and them homing-in on the correct tile column
-  game.getClosestTilePosition = function(tilePositions, x, restY, tileSize) {
+  // for animtating tiles and them homing-in on the correct tile column
+  // for tile bumping i.e. when a tile is already in "a" position include parameter excludePosition
+  // if holes are supplied prefer them
+  game.getClosestTilePosition = function(tilePositions, x, restY, tileSize, excludePosition, holes) {
     var playArea = document.querySelector(game.targetDiv).getBoundingClientRect();
     var closest = {x:"-1000", y:( (restY / 100) * playArea.height )}; /* record the destination position */
-    var closestPosition = {index:-1, distance:100000 };
-    for (var i=0; i<tilePositions.length; i++) {
-      var distance = ( Math.max(tilePositions[i].x, x) - Math.min(tilePositions[i].x, x) );
-      if ( distance < closestPosition.distance ) {
-        closestPosition.distance = distance;
-        closestPosition.index = i;
-      }
-      distance = ( Math.max(tilePositions[i].x + tileSize.Width, x) - Math.min(tilePositions[i].x + tileSize.Width, x) );
-      if ( distance < closestPosition.distance ) {
-        closestPosition.distance = distance;
-        closestPosition.index = i;
-      }
+    var closestPosition = {index:-1, distance:Number.MAX_SAFE_INTEGER };
+    let direction = "L"; // used for hole preference TODO:: once everything is working make this inital value random
+    let closestHoleX = Number.MAX_SAFE_INTEGER;
+    if (holes != null) {
+        // find the closest hole and its direction L/R
+        for (let i=0; i<holes.length; i++) {
+            let distance = ( Math.max(holes[i].x, x) - Math.min(holes[i].x, x) );
+            if ( distance < closestHoleX ) {
+                closestHoleX = distance;
+                // get direction
+                if (holes[i].x < x) {
+                    direction = "L";
+                } else {
+                    direction = "R";
+                }
+            }
+        }
+    }
+    for (let i=0; i<tilePositions.length; i++) {
+      if ( (excludePosition == null) || (tilePositions[i].x != excludePosition.x) ) {
+          let distance = ( Math.max(tilePositions[i].x, x) - Math.min(tilePositions[i].x, x) );
+          if ( distance < closestPosition.distance ) {
+            closestPosition.distance = distance;
+            closestPosition.index = i;
+          } else if ( ((distance == closestPosition.distance) || ((distance -1) == closestPosition.distance)) && direction == "R") {
+            closestPosition.distance = distance;
+            closestPosition.index = i;
+          }
+       }
     }
     if (closestPosition.index == -1) {
       throw "Anagram Shark Attack JS-E could not calculate a closest tile position for the given value x=[" + x + "]";
@@ -221,9 +315,10 @@ function Tile(letter, id, pos, size, zIndex) {
   var tile = this;
   tile.letter = letter;
   tile.id = id;
-  tile.pos = pos;
+  tile.pos = pos; // TODO:: can I make this a get;set; and update the style through that? because at the moment it is only used here for the inital creation
   tile.size = size;
   tile.userDropped = false;
+  tile.gameBumped = false;
   // TODO:: make this reusable animation class
   tile.animation = {timeStampStart:0, duration:0, fromPosition:{x:0, y:0}, toPosition:{x:0, y:0}, toDistance:{x:0, y:0}};
   tile.element = null;
@@ -296,6 +391,7 @@ function DraggableElement(element, draggableArea, tile) {
   // set the draggable element, called from the mouse down event
   draggableElement.initateDrag = function(element, e) {
     draggableElement.element = element; 
+    draggableElement.tile.gameBumped = false;
     if (e.type=="mousedown") {
       draggableElement.offsetLeft = e.clientX - draggableElement.element.offsetLeft;
       draggableElement.offsetTop  = e.clientY - draggableElement.element.offsetTop;

@@ -26,5 +26,15 @@ do it the moment a animation is requested.
 and set a super z-index when dragging starts
 
 Once the tile has been animated to its correct location, that may have bumpped 1 or more other Tiles. 
+animation completes and then bump or animation gets into Tile position(or percentage of) and then bumps?
+tile animations should be quite quick so lets just wait until animation complete and then tile bump.
+and this can then create a wave affecting the next tile and next etc.
+Need to know where the hole/s are and how far they are.
+Should this be in the TilePositions array or can we just check which Tile is at which location?
+Check Tiles position and determine if that is known TilePosition.
 
-
+There is something going on in the second game that hole direction is not gettting calculated - Width is NaN
+also the orderTiles for bumps is not working - rare edge case - not sure what is causing it
+grab should cancel bump- fixed
+Got rid of lots of dupe code that was added to ensure Tile Width was taken into account, but was totally unneeded.
+There was a rounding issue. The size of the play area causing the distance between tiles to differ.
