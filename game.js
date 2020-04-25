@@ -86,7 +86,7 @@ function Game(name, targetDiv) {
                 tile.userDropped = false; // we have reached our destination
                 tile.animation.timeStampStart = 0; // for future instances
                 game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
-            } 
+                if (game.checkWord(tilePositions, tiles)) { game.setTilesToWin(tiles); }            } 
         }
     });
     animatableTiles = tiles.filter(x => x.gameBumped);
@@ -112,6 +112,7 @@ function Game(name, targetDiv) {
                 tile.gameBumped = false; // we have reached our destination
                 tile.animation.timeStampStart = 0; // for future instances
                 game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
+                if (game.checkWord(tilePositions, tiles)) { game.setTilesToWin(tiles); } 
             } 
         }
     });
@@ -119,17 +120,33 @@ function Game(name, targetDiv) {
     requestAnimationFrame(game.animate);
   }
   
+  game.setTilesToWin = function(tiles) {
+    for (let i=0;i<tiles.length;i++) {
+        tiles[i].element.style.animation = "tile-win-animation 2.5s ease " + i + "s forwards";
+    }
+  }
+  
+  game.checkWord = function(tilePositions, tiles) {
+    if (game.getHoles(tilePositions, tiles) > 0) { return false; }
+    if ( (tiles.filter(x => x.gameBumped).length > 0) || (tiles.filter(x => x.userDropped).length > 0) ) { return false; }
+    let matches = 0;
+    tiles.sort(function(a, b){
+        return a.element.style.left.slice(0,-2) - b.element.style.left.slice(0,-2); // sort smallest to largest
+    });
+    for (let i=0;i<tiles.length;i++) {
+        if (word[i] == tiles[i].letter.toLowerCase()) {
+            matches++;
+        }
+    }
+    console.log(matches == word.length);
+    return (matches == word.length);
+  }
+  
   // bump co-existing tiles to cloest empties, or at least create the animations
   game.bumpTiles = function(tiles, tilePositions, masterTile, tileSize) {
     // FYI masterTileile is not to be bumped as each position is a FIFO queue.
     // need an array of possible holes before being able to determine who can go where
-    let holes = [];
-    tilePositions.forEach(function(tilePosition) {
-        let tilesAtPosition = game.tilesAtPosition(tiles, tilePosition);
-        if (tilesAtPosition.length == 0) {
-            holes.push(tilePosition); // no tiles here, its a hole!
-        } 
-    });
+    let holes = game.getHoles(tilePositions, tiles);
     tilePositions.forEach(function(tilePosition) {
         let tilesAtPosition = game.tilesAtPosition(tiles, tilePosition);
         if (tilesAtPosition.length > 1) { 
@@ -149,6 +166,18 @@ function Game(name, targetDiv) {
         }
     });
 
+  }
+
+  // get all the Holes
+  game.getHoles = function(tilePositions, tiles) {
+    let holes = [];
+    tilePositions.forEach(function(tilePosition) {
+        let tilesAtPosition = game.tilesAtPosition(tiles, tilePosition);
+        if (tilesAtPosition.length == 0) {
+            holes.push(tilePosition); // no tiles here, its a hole!
+        } 
+    });
+    return holes;
   }
   
   // check how many tiles at this position
@@ -463,4 +492,5 @@ var Random = {
     return min + ( max * this.getRandom());
   },
 };
+
 

@@ -76,11 +76,6 @@ body {
   100% { top: 40%; }
 }
 
-.win {
-  /* animation: tile-win-animation 2.5s ease; */
-  transform: translate(0px, -300%) rotateY(0deg) scale(1.0); 
-}
-
 @keyframes tile-win-animation {
   0% { 
     opacity:0.5;
