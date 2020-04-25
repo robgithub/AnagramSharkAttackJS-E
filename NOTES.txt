@@ -42,6 +42,3 @@ orderTiles is not creating consistent sequences, had fun adding a debug class sh
 
 add styling when Tile grabbed
 remove animation class if grabbed during the inital bob animation.
-
-Word is correct - end of level animation
-  Zoom(in/out) each tile in turn and then rotate on y and translate off the screen, single CSS class of animation applied in the same way as the bob-up but with a fixed delay
