@@ -1,10 +1,16 @@
+body {
+  
+}
+
 #playarea {
   background-color:#ff0000;
         position:absolute;
+        perspective: 600px;
 }
 #playarea2 {
   background-color:#00ff00;
         position:absolute;
+        perspective: 600px;
 }
 .tile {
   background-color: #5f5fc5b3;
@@ -68,5 +74,33 @@
   80%  { top: 35%; }
   90%  { top: 45%; }
   100% { top: 40%; }
+}
 
+.win {
+  /* animation: tile-win-animation 2.5s ease; */
+  transform: translate(0px, -300%) rotateY(0deg) scale(1.0); 
+}
+
+@keyframes tile-win-animation {
+  0% { 
+    opacity:0.5;
+    transform: scale(1.0); 
+  }
+  50% { 
+    opacity:1;
+    transform: scale(1.5) rotateY(25deg);
+  }
+  60% {
+    transform: translate(0px, 25%) scale(1.5) rotateY(30deg); 
+  }
+  70% {
+    transform: scale(1.0) rotateY(35deg); 
+  }
+  100% {
+    transform: translate(0px, -300%) rotateY(860deg) scale(1.0); 
+  }
+}
+
+#playarea {
+    color: #fff;
 }
