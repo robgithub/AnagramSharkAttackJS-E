@@ -44,10 +44,10 @@ function Game(name, targetDiv) {
     var playArea = document.querySelector(game.targetDiv).getBoundingClientRect(); // Get the play area to determine the Tile size
     var tilePadding = 2; // TODO:: revisit, percentage of tile?
     maxTileSize = game.calculateMaxTileSize(playArea.width, word.length, tilePadding); // based on play area, word length and tile padding, work out the maximum possible tile size
-    logger.debug(1, "calculateMaxTileSize() returned [" + maxTileSize + "]");
+    logger.debug(2, "calculateMaxTileSize() returned [" + maxTileSize + "]");
     tileSize = game.calculateTileSize(maxTileSize); // from the maximum tile size determine the best actuall size.
     var tileWidth = tileSize.w; // TODO:: why are we creating a new variable?
-    logger.debug(1, "calculateTileSize() returned [" + tileSize.w + ", " + tileSize.h + "]");
+    logger.debug(2, "calculateTileSize() returned [" + tileSize.w + ", " + tileSize.h + "]");
     tilePositions = game.calculateTilePositions(word, playArea, tileWidth, tilePadding); // locate the physical tile positions for the Tiles - this is then the list of possible position that Tiles should conform to.
     tiles = game.createTiles(shuffled, tilePositions, tileSize); // create the Tile objects from the shuffled word, the tile positions and the tileSize
     game.attachTiles(tiles); // Attach the Tile divs to the draggable area and assign the draggable events to the tiles. Also adds the initial startup Bob animation, via random delay
@@ -222,7 +222,7 @@ function Game(name, targetDiv) {
       newTile.hidden = true; // Start hidden before the "bob" animation
       document.querySelector(game.targetDiv).append(newTile);
       new DraggableElement(newTile, targetDiv, tiles[i]);
-      setTimeout(game.tileBobUp, Random.getRandomRange(100, 1000), newTile);
+      setTimeout(game.tileBobUp, Random.getRandomRange(100, 1000), newTile); // random wait before launching the CSS bob anaimtion
     }
   }
 
@@ -246,9 +246,9 @@ function Game(name, targetDiv) {
   
   // where do the Tiles sit in space?
   game.calculateTilePositions = function(word, playArea, tileWidth, tilePadding) {
-    logger.debug(1, "calculateTilePositions() tileWidth = [" + tileWidth + "] tilePadding = [" + tilePadding + "]");
+    logger.debug(2, "calculateTilePositions() tileWidth = [" + tileWidth + "] tilePadding = [" + tilePadding + "]");
     var x = (playArea.width - ((tileWidth + tilePadding) * word.length)) /2;
-    logger.debug(1, "calculateTilePositions() playArea.width = [" + playArea.width + "] initial x = [" + x + "]");
+    logger.debug(2, "calculateTilePositions() playArea.width = [" + playArea.width + "] initial x = [" + x + "]");
     var positions = [];
     positions.push(new TilePosition(Math.round(x), Math.round( (restY / 100) * playArea.height ))); 
     for (var i = 1; i < word.length; i++) {
@@ -367,6 +367,7 @@ function Logger(debugLevel) {
 
 // DraggableElement class
 // where draggableArea is the element the dragging will occur in
+// has a number of Tile specific elements making it non-generic :(
 function DraggableElement(element, draggableArea, tile) {
   var draggableElement = this;
   draggableElement.element = element;
@@ -393,6 +394,8 @@ function DraggableElement(element, draggableArea, tile) {
   draggableElement.initateDrag = function(element, e) {
     draggableElement.element = element; 
     draggableElement.tile.gameBumped = false;
+    draggableElement.element.classList.remove('bob-up');
+    draggableElement.element.classList.add("selected")
     if (e.type=="mousedown") {
       draggableElement.offsetLeft = e.clientX - draggableElement.element.offsetLeft;
       draggableElement.offsetTop  = e.clientY - draggableElement.element.offsetTop;
@@ -429,6 +432,7 @@ function DraggableElement(element, draggableArea, tile) {
     if (draggableElement.element) {
       draggableElement.draggableArea.removeEventListener("mousemove", draggableElement.dragElement);
       draggableElement.draggableArea.removeEventListener("touchmove", draggableElement.dragElement);
+      draggableElement.element.classList.remove("selected")
       draggableElement.element = null;
       draggableElement.tile.userDropped = true; // main animation loop will identify a tile that needs to be animated to its nearest column position
     }
