@@ -1,0 +1,44 @@
+Notes to myself
+
+So I have a dragged Tile marked as userDropped == true and picked up in my animation loop.
+I need to detail where to animate FROM and TO and how much to animate in a given time frame. Or decide how long it will take in time to animate to there.
+The FROM is easy as it is just the current Tile loation - how is this set? DONE .left and .top
+The TO is two values, the column closest and the height the Tile should align too. I think this should be either the current height or a percentage below it.
+
+How to calculate the best position?
+The value is a point and refers directly to the .left and .top of the tile
+I have my TilePositions array with these values.
+Check which of the X values is closest.
+lowest value of Math.max(pos[i], x) - Math.min(pos[i], x)
+this has to be expanded to the tile width
+
+The amount is a bit more complicated. I can record the initial time the animation started and then get the exact timestamp each time a frame is called.
+Math will then create a 0.0-1.0 value that is the distance over speed.
+Set the flag userDropped = false
+
+Set z-order to allow last dropped title to be above other tiles
+initially all tiles are numbered in order of creation
+1234
+if I drag tile 3 then tile 4 should become z-index 3 and the dragged tile should become z-index 4
+if I then drag tile 1 it should become z-index 4 and all the rest are lowered by 1
+Where can I do this z-index reordering?
+do it the moment a animation is requested.
+and set a super z-index when dragging starts
+
+Once the tile has been animated to its correct location, that may have bumpped 1 or more other Tiles. 
+animation completes and then bump or animation gets into Tile position(or percentage of) and then bumps?
+tile animations should be quite quick so lets just wait until animation complete and then tile bump.
+and this can then create a wave affecting the next tile and next etc.
+Need to know where the hole/s are and how far they are.
+Should this be in the TilePositions array or can we just check which Tile is at which location?
+Check Tiles position and determine if that is known TilePosition.
+
+There is something going on in the second game that hole direction is not gettting calculated - Width is NaN
+also the orderTiles for bumps is not working - rare edge case - not sure what is causing it
+grab should cancel bump- fixed
+Got rid of lots of dupe code that was added to ensure Tile Width was taken into account, but was totally unneeded.
+There was a rounding issue. The size of the play area causing the distance between tiles to differ.
+orderTiles is not creating consistent sequences, had fun adding a debug class showing the z-index in real time to understand
+
+add styling when Tile grabbed
+remove animation class if grabbed during the inital bob animation.
