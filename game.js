@@ -2,26 +2,26 @@
 snap
 Anagram Shark Attack JS-E
 =========================
-2019 Rob-on-earth
+2020 Rob-on-earth
 
 */
 'use strict';
 function Game(name, targetDiv) {
   // "name" is not currently used in any way, could be title text
   // TODO:: review var const and let
-  var game = this; // our instance
+  let game = this; // our instance
   game.targetDiv = targetDiv; // save the targetDiv as passed to the Game by the initialisation code
-  var debugLevel = 1; // only show debug messages to this depth
-  var logger = new Logger(debugLevel); // create an instance of the Logger class to do logging
-  var level = 0; // waiting to start
-  var word = ''; // the current word for the level
-  var tiles = []; // all the tile instances
+  let debugLevel = 1; // only show debug messages to this depth
+  let logger = new Logger(debugLevel); // create an instance of the Logger class to do logging
+  let level = 0; // waiting to start
+  let word = ''; // the current word for the level
+  let tiles = []; // all the tile instances
   // TODO:: set as const if possible
-  var words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','coelacanth','nudibranch','bobbitworm','giantclam' ] ];
-  var tilePositions = [];  // where tiles can be and what state each position is
-  var restY=40; // Resting position of the tiles, percentage
-  var maxTileSize = null; // to be calculated
-  var tileSize = null; // to be calculated
+  let words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','coelacanth','nudibranch','bobbitworm','giantclam' ] ];
+  let tilePositions = [];  // where tiles can be and what state each position is
+  let restY=40; // Resting position of the tiles, percentage
+  let maxTileSize = null; // to be calculated
+  let tileSize = null; // to be calculated
   const baseTileZIndex = 10;
 
   // example debug to return the instance of a tiles, otherwise everything is private
@@ -36,23 +36,28 @@ function Game(name, targetDiv) {
   // Public START method
   game.start = function() {
     logger.debug(0, "it has begun");
+    // create game loop for animations
+    game.animate();
+    game.newLevel();
+  }
+  
+  // initiate a new level - will destroy all the previous elements if they exist
+  game.newLevel = function() {
     level++; // move from level=0 to level=1
     word = game.getWord(level); // get the random word from the requested level, higher the level the longer the words get
-    var shuffled = game.shuffle(word); // create a shuffled version of the word ready to be descrambled
+    let shuffled = game.shuffle(word); // create a shuffled version of the word ready to be descrambled
     logger.debug(0, "The word ["+ word +"] is shuffled as [" + shuffled + "]");
     // Word has been selected and shuffled
-    var playArea = document.querySelector(game.targetDiv).getBoundingClientRect(); // Get the play area to determine the Tile size
-    var tilePadding = 2; // TODO:: revisit, percentage of tile?
+    let playArea = document.querySelector(game.targetDiv).getBoundingClientRect(); // Get the play area to determine the Tile size
+    let tilePadding = 2; // TODO:: revisit, percentage of tile?
     maxTileSize = game.calculateMaxTileSize(playArea.width, word.length, tilePadding); // based on play area, word length and tile padding, work out the maximum possible tile size
     logger.debug(2, "calculateMaxTileSize() returned [" + maxTileSize + "]");
     tileSize = game.calculateTileSize(maxTileSize); // from the maximum tile size determine the best actuall size.
-    var tileWidth = tileSize.w; // TODO:: why are we creating a new variable?
+    let tileWidth = tileSize.w; // TODO:: why are we creating a new variable?
     logger.debug(2, "calculateTileSize() returned [" + tileSize.w + ", " + tileSize.h + "]");
     tilePositions = game.calculateTilePositions(word, playArea, tileWidth, tilePadding); // locate the physical tile positions for the Tiles - this is then the list of possible position that Tiles should conform to.
     tiles = game.createTiles(shuffled, tilePositions, tileSize); // create the Tile objects from the shuffled word, the tile positions and the tileSize
     game.attachTiles(tiles); // Attach the Tile divs to the draggable area and assign the draggable events to the tiles. Also adds the initial startup Bob animation, via random delay
-    // create game loop
-    game.animate();
   }
   
   // Game animation loop
@@ -225,22 +230,22 @@ function Game(name, targetDiv) {
   // returns a TileSize object
   // Allows additional checks on available space after initial calculation purely on Width
   game.calculateTileSize = function(max){
-    var size = new TileSize(max, max);
+    let size = new TileSize(max, max);
     return size; // TODO base on targeDiv size
   }
   
   // calculate the maximum possible tile size based on playarea
   // returns a single integer representing the maximum number of pixels a tile can be in height(and width)
   game.calculateMaxTileSize = function(playAreaWidth, wordLength, tilePadding){
-    var result = (playAreaWidth - ((wordLength + 2 + 1) * tilePadding)) / (wordLength + 2);
+    let result = (playAreaWidth - ((wordLength + 2 + 1) * tilePadding)) / (wordLength + 2);
     return result;
   }
   
   // shuffle the letter order
   game.shuffle = function(word) {
-    var shuffled = "".padStart(word.length, '_');
-    for (var i = 0; i< word.length; i++) {
-      var charIndx = Math.floor(Random.getRandomRange(0, word.length));
+    let shuffled = "".padStart(word.length, '_');
+    for (let i = 0; i< word.length; i++) {
+      let charIndx = Math.floor(Random.getRandomRange(0, word.length));
       while ((shuffled[charIndx] != '_') || ((charIndx == i) && (shuffled.match(/_/g).length != 1) )) {
         charIndx = Math.floor(Random.getRandomRange(0, word.length));
       }
@@ -251,16 +256,16 @@ function Game(name, targetDiv) {
 
   // replace character at index in a string
   game.replaceAt = function(word, index, change) {
-    var asArray = word.split("");
+    let asArray = word.split("");
     asArray[index] = change;
     return asArray.join("");
   }
 
   // attach tiles to DOM as draggable elements
   game.attachTiles = function(tiles) {
-    var targetDiv = document.querySelector(game.targetDiv);
-    for (var i = 0; i<tiles.length;i++) {
-      var newTile = tiles[i].create();
+    let targetDiv = document.querySelector(game.targetDiv);
+    for (let i = 0; i<tiles.length;i++) {
+      let newTile = tiles[i].create();
       tiles[i].element = newTile;
       newTile.hidden = true; // Start hidden before the "bob" animation
       document.querySelector(game.targetDiv).append(newTile);
@@ -279,9 +284,9 @@ function Game(name, targetDiv) {
 
   // Create all the tile objects
   game.createTiles = function(word, positions, tileSize) {
-    var tileArray = [];
-    for (var i = 0; i< word.length;i++) {
-      var letter = word[i];
+    let tileArray = [];
+    for (let i = 0; i< word.length;i++) {
+      let letter = word[i];
       tileArray.push(new Tile(letter.toUpperCase(), i, positions[i], tileSize, baseTileZIndex + i)); 
     }
     return tileArray;
@@ -290,11 +295,11 @@ function Game(name, targetDiv) {
   // where do the Tiles sit in space?
   game.calculateTilePositions = function(word, playArea, tileWidth, tilePadding) {
     logger.debug(2, "calculateTilePositions() tileWidth = [" + tileWidth + "] tilePadding = [" + tilePadding + "]");
-    var x = (playArea.width - ((tileWidth + tilePadding) * word.length)) /2;
+    let x = (playArea.width - ((tileWidth + tilePadding) * word.length)) /2;
     logger.debug(2, "calculateTilePositions() playArea.width = [" + playArea.width + "] initial x = [" + x + "]");
-    var positions = [];
+    let positions = [];
     positions.push(new TilePosition(Math.round(x), Math.round( (restY / 100) * playArea.height ))); 
-    for (var i = 1; i < word.length; i++) {
+    for (let i = 1; i < word.length; i++) {
       x += tileWidth + tilePadding
       positions.push(new TilePosition(Math.round(x), Math.round((restY / 100) * playArea.height) ));
     }
@@ -306,9 +311,9 @@ function Game(name, targetDiv) {
   // for tile bumping i.e. when a tile is already in "a" position include parameter excludePosition
   // if holes are supplied prefer them
   game.getClosestTilePosition = function(tilePositions, x, restY, tileSize, excludePosition, holes) {
-    var playArea = document.querySelector(game.targetDiv).getBoundingClientRect();
-    var closest = {x:"-1000", y:( (restY / 100) * playArea.height )}; /* record the destination position */
-    var closestPosition = {index:-1, distance:Number.MAX_SAFE_INTEGER };
+    let playArea = document.querySelector(game.targetDiv).getBoundingClientRect();
+    let closest = {x:"-1000", y:( (restY / 100) * playArea.height )}; /* record the destination position */
+    let closestPosition = {index:-1, distance:Number.MAX_SAFE_INTEGER };
     let direction = "L"; // used for hole preference TODO:: once everything is working make this inital value random
     let closestHoleX = Number.MAX_SAFE_INTEGER;
     if (holes != null) {
@@ -359,7 +364,7 @@ const TileState = Object.freeze({NONE:"NONE", USERDROPPED: "USERDROPPED", GAMEBU
 
 // Title class
 function Tile(letter, id, pos, size, zIndex) {
-  var tile = this;
+  let tile = this;
   tile.letter = letter;
   tile.id = id;
   tile.pos = pos; // TODO:: can I make this a get;set; and update the style through that? because at the moment it is only used here for the inital creation
@@ -371,11 +376,11 @@ function Tile(letter, id, pos, size, zIndex) {
   tile.element = null;
   
   tile.create = function() {
-    var element = document.createElement('div');
+    let element = document.createElement('div');
     element.className = "tile no-select letter-" + tile.letter +" tile-" + tile.id + "";
     element.setAttribute("style","left:" + tile.pos.x + "px;top:" + tile.pos.y + "px;width:" + tile.size.w + "px;height:" + tile.size.h + "px");
     element.style.zIndex = zIndex;
-    var innerElement = document.createElement('div');
+    let innerElement = document.createElement('div');
     innerElement.className = "inner";
     innerElement.innerHTML = '<svg viewBox="0 0 100 100"><text x="18" y="90%">'+ tile.letter +'</text></svg>';
     element.append(innerElement);
@@ -385,14 +390,14 @@ function Tile(letter, id, pos, size, zIndex) {
 
 // Tile position class
 function TilePosition(x, y) {
-  var tilePosition = this;
+  let tilePosition = this;
   tilePosition.x = x;
   tilePosition.y = y;
 }
 
 // Tile size class
 function TileSize(w, h) {
-  var tileSize = this;
+  let tileSize = this;
   tileSize.w = w;
   tileSize.h = h;
 }
@@ -400,7 +405,7 @@ function TileSize(w, h) {
 
 // Logger class
 function Logger(debugLevel) {
-  var logger = this;
+  let logger = this;
   debugLevel = debugLevel;
 
   // log any debug messages that are at the threshold of debugLevel or below.
@@ -415,7 +420,7 @@ function Logger(debugLevel) {
 // where draggableArea is the element the dragging will occur in
 // has a number of Tile specific elements making it non-generic :(
 function DraggableElement(element, draggableArea, tile) {
-  var draggableElement = this;
+  let draggableElement = this;
   draggableElement.element = element;
   draggableElement.draggableArea = draggableArea;
   draggableElement.offsetLeft = 0;
