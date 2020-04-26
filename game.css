@@ -1,16 +1,12 @@
-body {
-  
-}
-
 #playarea {
   background-color:#ff0000;
-        position:absolute;
-        perspective: 600px;
+  position:absolute;
+  perspective: 600px;
 }
 #playarea2 {
   background-color:#00ff00;
-        position:absolute;
-        perspective: 600px;
+  position:absolute;
+  perspective: 600px;
 }
 .tile {
   background-color: #5f5fc5b3;
@@ -92,7 +88,7 @@ body {
     transform: scale(1.0) rotateY(35deg); 
   }
   100% {
-    transform: translate(0px, -300%) rotateY(860deg) scale(1.0); 
+    transform: rotateY(860deg) scale(1.0); 
   }
 }
 

@@ -45,3 +45,13 @@ remove animation class if grabbed during the inital bob animation.
 
 Word is correct - end of level animation
   Zoom(in/out) each tile in turn and then rotate on y and translate off the screen, single CSS class of animation applied in the same way as the bob-up but with a fixed delay
+  
+Make all the tile alignment animations distance aware - currently animation takes 2s for tile 1px away from its destination.
+  work out percentage distance within total play area
+  
+Make the winning animation compensate for the height of the Tile, currently the first level works fine but subsequent levels the tiles get "stuck" at the top of the screen.
+  considered dynamic stylesheets but this would require Content Security Policy
+  work out the required difference in height and before animating set a negative margin and increase the top value so they appear in the same place. The animation will then work due to the real height.
+  this will only work for screen ratios 800x600 
+  create animation for up movement only
+  
