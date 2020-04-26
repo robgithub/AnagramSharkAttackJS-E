@@ -58,7 +58,7 @@ function Game(name, targetDiv) {
   // Game animation loop
   game.animate = function(timeStamp) {
     // check if any objects need animating
-    let animatableTiles = tiles.filter(x => x.userDropped);
+    let animatableTiles = tiles.filter(x => x.state == TileState.USERDROPPED);
     animatableTiles.forEach(function(tile) {
         // this is animatable tile has it got a timeStampStart yet?
         if (tile.animation.timeStampStart == 0) {
@@ -83,13 +83,13 @@ function Game(name, targetDiv) {
             tile.element.style.top  = (tile.animation.fromPosition.y + (tile.animation.toDistance.y * timeFraction)) + 'px';
             logger.debug(3, "Tile["+ tile.letter +"]timeFraction = " + timeFraction);
             if ( timeFraction == 1 ) {
-                tile.userDropped = false; // we have reached our destination
+                tile.state = TileState.NONE; // we have reached our destination
                 tile.animation.timeStampStart = 0; // for future instances
                 game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
                 if (game.checkWord(tilePositions, tiles)) { game.setTilesToWin(tiles); }            } 
         }
     });
-    animatableTiles = tiles.filter(x => x.gameBumped);
+    animatableTiles = tiles.filter(x => x.state == TileState.GAMEBUMPED);
     animatableTiles.forEach(function(tile) {
         // this is animatable tile has it got a timeStampStart yet?
         if (tile.animation.timeStampStart == 0) {
@@ -109,7 +109,7 @@ function Game(name, targetDiv) {
             tile.element.style.top  = (tile.animation.fromPosition.y + (tile.animation.toDistance.y * timeFraction)) + 'px';
             logger.debug(3, "Bump Tile["+ tile.letter +"]timeFraction = " + timeFraction);
             if ( timeFraction == 1 ) {
-                tile.gameBumped = false; // we have reached our destination
+                tile.state = TileState.NONE; // we have reached our destination
                 tile.animation.timeStampStart = 0; // for future instances
                 game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
                 if (game.checkWord(tilePositions, tiles)) { game.setTilesToWin(tiles); } 
@@ -125,7 +125,7 @@ function Game(name, targetDiv) {
     for (let i=0;i<tiles.length;i++) {
         tiles[i].element.style.animation = "tile-win-animation 2.5s ease " + i + "s forwards";
         tiles[i].element.addEventListener('animationend', (e) => {
-            tiles[i].won = true;
+            tiles[i].state = TileState.GAMEWON;
             if (game.checkAllWon()) {
                 console.log("new level!");
             }
@@ -135,7 +135,7 @@ function Game(name, targetDiv) {
 
   // return true if the number of tiles marked as won is the total number of tiles.
   game.checkAllWon = function() {
-    return ( (tiles.filter(x => x.won)).length == tiles.length);
+    return ( (tiles.filter(x => x.state == TileState.GAMEWON)).length == tiles.length);
   }
  
   // check to see if the number of tiles in place and in the correct order are the winning word 
@@ -143,7 +143,7 @@ function Game(name, targetDiv) {
   // TODO::need to shark proof this
   game.checkWord = function(tilePositions, tiles) {
     if (game.getHoles(tilePositions, tiles) > 0) { return false; }
-    if ( (tiles.filter(x => x.gameBumped).length > 0) || (tiles.filter(x => x.userDropped).length > 0) ) { return false; }
+    if ( (tiles.filter(x => x.state == TileState.GAMEBUMPED).length > 0) || (tiles.filter(x => x.state == TileState.USERDROPPED).length > 0) ) { return false; }
     let matches = 0;
     tiles.sort(function(a, b){
         return a.element.style.left.slice(0,-2) - b.element.style.left.slice(0,-2); // sort smallest to largest
@@ -174,7 +174,7 @@ function Game(name, targetDiv) {
                     tile.animation.toPosition = game.getClosestTilePosition(tilePositions, tile.animation.fromPosition.x, restY, tileSize, tile.animation.fromPosition, holes);
                     tile.animation.toDistance.x = tile.animation.toPosition.x - tile.animation.fromPosition.x;
                     tile.animation.toDistance.y = tile.animation.toPosition.y - tile.animation.fromPosition.y;
-                    tile.gameBumped = true; // will get picked up in the next animation frame
+                    tile.state = TileState.GAMEBUMPED; // will get picked up in the next animation frame
                 }
             });
         }
@@ -354,6 +354,9 @@ function Game(name, targetDiv) {
 
 }
 
+// Tile State - enum equivilant
+const TileState = Object.freeze({NONE:"NONE", USERDROPPED: "USERDROPPED", GAMEBUMPED: "GAMEBUMPED", GAMEWON: "GAMEWON"})
+
 // Title class
 function Tile(letter, id, pos, size, zIndex) {
   var tile = this;
@@ -361,9 +364,8 @@ function Tile(letter, id, pos, size, zIndex) {
   tile.id = id;
   tile.pos = pos; // TODO:: can I make this a get;set; and update the style through that? because at the moment it is only used here for the inital creation
   tile.size = size;
-  tile.userDropped = false; // TODO:: these are all conflicting states and should be an enum
-  tile.gameBumped = false;
-  tile.won = false;
+  tile.state = TileState.NONE;
+ 
   // TODO:: make this reusable animation class
   tile.animation = {timeStampStart:0, duration:0, fromPosition:{x:0, y:0}, toPosition:{x:0, y:0}, toDistance:{x:0, y:0}};
   tile.element = null;
@@ -437,7 +439,7 @@ function DraggableElement(element, draggableArea, tile) {
   // set the draggable element, called from the mouse down event
   draggableElement.initateDrag = function(element, e) {
     draggableElement.element = element; 
-    draggableElement.tile.gameBumped = false;
+    draggableElement.tile.state = TileState.NONE;
     draggableElement.element.classList.remove('bob-up');
     draggableElement.element.classList.add("selected")
     if (e.type=="mousedown") {
@@ -464,7 +466,7 @@ function DraggableElement(element, draggableArea, tile) {
         draggableElement.element.style.top =  (e.targetTouches[0].clientY - draggableElement.offsetTop)   + 'px';
       }
       draggableElement.element.style.zIndex = 100; // when dragging always on top, ordering happens when the tile is dropped
-      draggableElement.tile.userDropped = false;
+      draggableElement.tile.state = TileState.NONE;
       draggableElement.tile.animation.timeStampStart = 0;
     }
   }
@@ -478,7 +480,7 @@ function DraggableElement(element, draggableArea, tile) {
       draggableElement.draggableArea.removeEventListener("touchmove", draggableElement.dragElement);
       draggableElement.element.classList.remove("selected")
       draggableElement.element = null;
-      draggableElement.tile.userDropped = true; // main animation loop will identify a tile that needs to be animated to its nearest column position
+      draggableElement.tile.state = TileState.USERDROPPED; // main animation loop will identify a tile that needs to be animated to its nearest column position
     }
   }
 
