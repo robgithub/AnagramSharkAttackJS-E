@@ -56,6 +56,11 @@ function Game(name, targetDiv) {
     let tileWidth = tileSize.w; // TODO:: why are we creating a new variable?
     logger.debug(2, "calculateTileSize() returned [" + tileSize.w + ", " + tileSize.h + "]");
     tilePositions = game.calculateTilePositions(word, playArea, tileWidth, tilePadding); // locate the physical tile positions for the Tiles - this is then the list of possible position that Tiles should conform to.
+    if (tiles.length > 0) {
+        tiles.forEach(function(tile) {
+            tile.element.remove();
+        });
+    }
     tiles = game.createTiles(shuffled, tilePositions, tileSize); // create the Tile objects from the shuffled word, the tile positions and the tileSize
     game.attachTiles(tiles); // Attach the Tile divs to the draggable area and assign the draggable events to the tiles. Also adds the initial startup Bob animation, via random delay
   }
@@ -91,7 +96,11 @@ function Game(name, targetDiv) {
                 tile.state = TileState.NONE; // we have reached our destination
                 tile.animation.timeStampStart = 0; // for future instances
                 game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
-                if (game.checkWord(tilePositions, tiles)) { game.setTilesToWin(tiles); }            } 
+                if (game.checkWord(tilePositions, tiles)) { 
+                        game.setTilesToWin(tiles); 
+                        game.newLevel();
+                    }            
+            } 
         }
     });
     animatableTiles = tiles.filter(x => x.state == TileState.GAMEBUMPED);
@@ -118,6 +127,10 @@ function Game(name, targetDiv) {
                 tile.animation.timeStampStart = 0; // for future instances
                 game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
                 if (game.checkWord(tilePositions, tiles)) { game.setTilesToWin(tiles); } 
+                if (game.checkWord(tilePositions, tiles)) { 
+                        game.setTilesToWin(tiles); 
+                        game.newLevel();
+                    }            
             } 
         }
     });
