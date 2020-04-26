@@ -120,12 +120,27 @@ function Game(name, targetDiv) {
     requestAnimationFrame(game.animate);
   }
   
+  // set the tiles to win mode, animates them off the screen and then initiates a new level if all animations are finished.
   game.setTilesToWin = function(tiles) {
     for (let i=0;i<tiles.length;i++) {
         tiles[i].element.style.animation = "tile-win-animation 2.5s ease " + i + "s forwards";
+        tiles[i].element.addEventListener('animationend', (e) => {
+            tiles[i].won = true;
+            if (game.checkAllWon()) {
+                console.log("new level!");
+            }
+        });
     }
   }
-  
+
+  // return true if the number of tiles marked as won is the total number of tiles.
+  game.checkAllWon = function() {
+    return ( (tiles.filter(x => x.won)).length == tiles.length);
+  }
+ 
+  // check to see if the number of tiles in place and in the correct order are the winning word 
+  // makes sure there are no holes or tiles being dragged/bumped
+  // TODO::need to shark proof this
   game.checkWord = function(tilePositions, tiles) {
     if (game.getHoles(tilePositions, tiles) > 0) { return false; }
     if ( (tiles.filter(x => x.gameBumped).length > 0) || (tiles.filter(x => x.userDropped).length > 0) ) { return false; }
@@ -138,7 +153,6 @@ function Game(name, targetDiv) {
             matches++;
         }
     }
-    console.log(matches == word.length);
     return (matches == word.length);
   }
   
@@ -347,8 +361,9 @@ function Tile(letter, id, pos, size, zIndex) {
   tile.id = id;
   tile.pos = pos; // TODO:: can I make this a get;set; and update the style through that? because at the moment it is only used here for the inital creation
   tile.size = size;
-  tile.userDropped = false;
+  tile.userDropped = false; // TODO:: these are all conflicting states and should be an enum
   tile.gameBumped = false;
+  tile.won = false;
   // TODO:: make this reusable animation class
   tile.animation = {timeStampStart:0, duration:0, fromPosition:{x:0, y:0}, toPosition:{x:0, y:0}, toDistance:{x:0, y:0}};
   tile.element = null;
