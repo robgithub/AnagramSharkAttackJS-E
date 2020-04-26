@@ -44,6 +44,9 @@ function Game(name, targetDiv) {
   // initiate a new level - will destroy all the previous elements if they exist
   game.newLevel = function() {
     level++; // move from level=0 to level=1
+    if (level > words.length) {
+        throw "Anagram Shark Attack JS-E has no more levels"
+    }
     word = game.getWord(level); // get the random word from the requested level, higher the level the longer the words get
     let shuffled = game.shuffle(word); // create a shuffled version of the word ready to be descrambled
     logger.debug(0, "The word ["+ word +"] is shuffled as [" + shuffled + "]");
@@ -51,10 +54,10 @@ function Game(name, targetDiv) {
     let playArea = document.querySelector(game.targetDiv).getBoundingClientRect(); // Get the play area to determine the Tile size
     let tilePadding = 2; // TODO:: revisit, percentage of tile?
     maxTileSize = game.calculateMaxTileSize(playArea.width, word.length, tilePadding); // based on play area, word length and tile padding, work out the maximum possible tile size
-    logger.debug(2, "calculateMaxTileSize() returned [" + maxTileSize + "]");
+    logger.debug(3, "calculateMaxTileSize() returned [" + maxTileSize + "]");
     tileSize = game.calculateTileSize(maxTileSize); // from the maximum tile size determine the best actuall size.
     let tileWidth = tileSize.w; // TODO:: why are we creating a new variable?
-    logger.debug(2, "calculateTileSize() returned [" + tileSize.w + ", " + tileSize.h + "]");
+    logger.debug(3, "calculateTileSize() returned [" + tileSize.w + ", " + tileSize.h + "]");
     tilePositions = game.calculateTilePositions(word, playArea, tileWidth, tilePadding); // locate the physical tile positions for the Tiles - this is then the list of possible position that Tiles should conform to.
     if (tiles.length > 0) {
         tiles.forEach(function(tile) {
@@ -65,9 +68,9 @@ function Game(name, targetDiv) {
     game.attachTiles(tiles); // Attach the Tile divs to the draggable area and assign the draggable events to the tiles. Also adds the initial startup Bob animation, via random delay
   }
   
-  // Game animation loop
+  // Game animation loop - called once per frame as conditions allow.
   game.animate = function(timeStamp) {
-    // check if any objects need animating
+    // check if any objects need animating for USERDROPPED
     let animatableTiles = tiles.filter(x => x.state == TileState.USERDROPPED);
     animatableTiles.forEach(function(tile) {
         // this is animatable tile has it got a timeStampStart yet?
@@ -96,13 +99,11 @@ function Game(name, targetDiv) {
                 tile.state = TileState.NONE; // we have reached our destination
                 tile.animation.timeStampStart = 0; // for future instances
                 game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
-                if (game.checkWord(tilePositions, tiles)) { 
-                        game.setTilesToWin(tiles); 
-                        game.newLevel();
-                    }            
+                if (game.checkWord(tilePositions, tiles)) { game.progressToNextLevel(tiles);  }            
             } 
         }
     });
+    // check if any objects need animating for GAMEBUMPED
     animatableTiles = tiles.filter(x => x.state == TileState.GAMEBUMPED);
     animatableTiles.forEach(function(tile) {
         // this is animatable tile has it got a timeStampStart yet?
@@ -110,7 +111,7 @@ function Game(name, targetDiv) {
             tile.animation.timeStampStart = timeStamp; // record the initial frame the animation starts
             game.orderTiles(tiles, tile);
             // all the other parameters are set in the bumpTiles function
-        } else { // TODO::CODE SMELL - DUPLICATE CODE
+        } else { 
             // we have work to do.
             let timeFraction = (timeStamp - tile.animation.timeStampStart) / tile.animation.duration; 
             if (timeFraction > 1) { 
@@ -126,11 +127,36 @@ function Game(name, targetDiv) {
                 tile.state = TileState.NONE; // we have reached our destination
                 tile.animation.timeStampStart = 0; // for future instances
                 game.bumpTiles(tiles, tilePositions, tile, tileSize); // do we need new animations for tiles that exist in the same location, defying the laws of science
-                if (game.checkWord(tilePositions, tiles)) { game.setTilesToWin(tiles); } 
-                if (game.checkWord(tilePositions, tiles)) { 
-                        game.setTilesToWin(tiles); 
-                        game.newLevel();
-                    }            
+                if (game.checkWord(tilePositions, tiles)) { game.progressToNextLevel(tiles); }            
+            } 
+        }
+    });
+    // check if any objects need animating for GAMEANIMWON - end of level "up" animation
+    animatableTiles = tiles.filter(x => x.state == TileState.GAMEANIMWON);
+    animatableTiles.forEach(function(tile) {
+        // this is animatable tile has it got a timeStampStart yet?
+        if (tile.animation.timeStampStart == 0) {
+            tile.animation.timeStampStart = timeStamp; // record the initial frame the animation starts 
+            tile.animation.duration = (1 * 1000); // seconds
+            tile.animation.fromPosition.y = parseFloat(tile.element.style.top.slice(0,-2)); // record the start position as numbers
+            tile.animation.toPosition.y = 0 - (tileSize.h * 1.5);
+            // calculate the distance to the toPosition, as this is the path we want to animate.
+            tile.animation.toDistance.y = tile.animation.toPosition.y - tile.animation.fromPosition.y;
+
+        } else { 
+            if (timeStamp >= tile.animation.timeStampStart + tile.animation.delay) {
+                // we have work to do.
+                let timeFraction = (timeStamp - (tile.animation.timeStampStart + tile.animation.delay)) / tile.animation.duration; 
+                if (timeFraction > 1) { 
+                    timeFraction = 1; // cannot go beyond the animation end
+                } 
+                // timeFraction is the value between 0.0 - 1.0 that defines the progress of the animation, so 0.5 is half way.
+                // Move the tile
+                tile.element.style.top  = (tile.animation.fromPosition.y + (tile.animation.toDistance.y * timeFraction)) + 'px';
+                if ( timeFraction == 1 ) {
+                    tile.state = TileState.NONE; // we have reached our destination
+                    tile.animation.timeStampStart = 0; // for future instances
+                }
             } 
         }
     });
@@ -139,15 +165,19 @@ function Game(name, targetDiv) {
   }
   
   // set the tiles to win mode, animates them off the screen and then initiates a new level if all animations are finished.
-  game.setTilesToWin = function(tiles) {
+  // the keyframes for this animation have a hard coded value of 300% for the movement up, the tiles need to be offset via a negative margin to make this work
+  game.progressToNextLevel = function(tiles) {
     for (let i=0;i<tiles.length;i++) {
-        tiles[i].element.style.animation = "tile-win-animation 2.5s ease " + i + "s forwards";
+        tiles[i].element.style.animation = "tile-win-animation 3s ease " + (i * 0.2) + "s forwards";
+        tiles[i].animation.delay = ((i * 0.2) + (2)) * 1000;
+        tiles[i].state = TileState.GAMEANIMWON;
         tiles[i].element.addEventListener('animationend', (e) => {
             tiles[i].state = TileState.GAMEWON;
             if (game.checkAllWon()) {
-                console.log("new level!");
+                logger.debug(0, "new level!");
+                game.newLevel();
             }
-        });
+        }); 
     }
   }
 
@@ -161,7 +191,7 @@ function Game(name, targetDiv) {
   // TODO::need to shark proof this
   game.checkWord = function(tilePositions, tiles) {
     if (game.getHoles(tilePositions, tiles) > 0) { return false; }
-    if ( (tiles.filter(x => x.state == TileState.GAMEBUMPED).length > 0) || (tiles.filter(x => x.state == TileState.USERDROPPED).length > 0) ) { return false; }
+    if ( (tiles.filter(x => x.state == TileState.GAMEBUMPED).length > 0) || (tiles.filter(x => x.state == TileState.USERDROPPED).length > 0) ) { return false; } // TODO:: add USERDRAGGING
     let matches = 0;
     tiles.sort(function(a, b){
         return a.element.style.left.slice(0,-2) - b.element.style.left.slice(0,-2); // sort smallest to largest
@@ -373,7 +403,7 @@ function Game(name, targetDiv) {
 }
 
 // Tile State - enum equivilant
-const TileState = Object.freeze({NONE:"NONE", USERDROPPED: "USERDROPPED", GAMEBUMPED: "GAMEBUMPED", GAMEWON: "GAMEWON"})
+const TileState = Object.freeze({NONE:"NONE", USERDROPPED: "USERDROPPED", GAMEBUMPED: "GAMEBUMPED", GAMEANIMWON: "GAMEANIMWON", GAMEWON: "GAMEWON"})
 
 // Title class
 function Tile(letter, id, pos, size, zIndex) {
@@ -385,7 +415,7 @@ function Tile(letter, id, pos, size, zIndex) {
   tile.state = TileState.NONE;
  
   // TODO:: make this reusable animation class
-  tile.animation = {timeStampStart:0, duration:0, fromPosition:{x:0, y:0}, toPosition:{x:0, y:0}, toDistance:{x:0, y:0}};
+  tile.animation = {timeStampStart:0, duration:0, fromPosition:{x:0, y:0}, toPosition:{x:0, y:0}, toDistance:{x:0, y:0}, delay:0};
   tile.element = null;
   
   tile.create = function() {
