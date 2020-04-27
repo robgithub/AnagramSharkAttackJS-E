@@ -8,16 +8,14 @@ Anagram Shark Attack JS-E
 'use strict';
 function Game(name, targetDiv) {
   // "name" is not currently used in any way, could be title text
-  // TODO:: review var const and let
   let game = this; // our instance
   game.targetDiv = targetDiv; // save the targetDiv as passed to the Game by the initialisation code
-  let debugLevel = 1; // only show debug messages to this depth
-  let logger = new Logger(debugLevel); // create an instance of the Logger class to do logging
+  const debugLevel = 1; // only show debug messages to this depth
+  const logger = new Logger(debugLevel); // create an instance of the Logger class to do logging
   let level = 0; // waiting to start
   let word = ''; // the current word for the level
   let tiles = []; // all the tile instances
-  // TODO:: set as const if possible
-  let words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','coelacanth','nudibranch','bobbitworm','giantclam' ] ];
+  const words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','coelacanth','nudibranch','bobbitworm','giantclam' ] ];
   let tilePositions = [];  // where tiles can be and what state each position is
   let restY=40; // Resting position of the tiles, percentage
   let maxTileSize = null; // to be calculated
@@ -45,7 +43,7 @@ function Game(name, targetDiv) {
   game.newLevel = function() {
     level++; // move from level=0 to level=1
     if (level > words.length) {
-        throw "Anagram Shark Attack JS-E has no more levels"
+        throw "Anagram Shark Attack JS-E has no more levels" // TODO:: handle this gracefully
     }
     word = game.getWord(level); // get the random word from the requested level, higher the level the longer the words get
     let shuffled = game.shuffle(word); // create a shuffled version of the word ready to be descrambled
@@ -191,7 +189,7 @@ function Game(name, targetDiv) {
   // TODO::need to shark proof this
   game.checkWord = function(tilePositions, tiles) {
     if (game.getHoles(tilePositions, tiles) > 0) { return false; }
-    if ( (tiles.filter(x => x.state == TileState.GAMEBUMPED).length > 0) || (tiles.filter(x => x.state == TileState.USERDROPPED).length > 0) ) { return false; } // TODO:: add USERDRAGGING
+    if ( (tiles.filter(x => x.state == TileState.NONE).length != tiles.length) ) { return false; } // make sure the Tiles aren't busy
     let matches = 0;
     tiles.sort(function(a, b){
         return a.element.style.left.slice(0,-2) - b.element.style.left.slice(0,-2); // sort smallest to largest
@@ -403,7 +401,7 @@ function Game(name, targetDiv) {
 }
 
 // Tile State - enum equivilant
-const TileState = Object.freeze({NONE:"NONE", USERDROPPED: "USERDROPPED", GAMEBUMPED: "GAMEBUMPED", GAMEANIMWON: "GAMEANIMWON", GAMEWON: "GAMEWON"})
+const TileState = Object.freeze({NONE:"NONE", USERDROPPED: "USERDROPPED", USERDRAGGING: "USERDRAGGING", GAMEBUMPED: "GAMEBUMPED", GAMEANIMWON: "GAMEANIMWON", GAMEWON: "GAMEWON"})
 
 // Title class
 function Tile(letter, id, pos, size, zIndex) {
@@ -499,6 +497,7 @@ function DraggableElement(element, draggableArea, tile) {
       draggableElement.offsetTop  = e.targetTouches[0].clientY - draggableElement.element.offsetTop;
       draggableElement.draggableArea.addEventListener("touchmove", draggableElement.dragElement, false);
     }
+    draggableElement.tile.state = TileState.USERDRAGGING;
   }
 
   // Drag element where ever the mouse is
@@ -514,7 +513,7 @@ function DraggableElement(element, draggableArea, tile) {
         draggableElement.element.style.top =  (e.targetTouches[0].clientY - draggableElement.offsetTop)   + 'px';
       }
       draggableElement.element.style.zIndex = 100; // when dragging always on top, ordering happens when the tile is dropped
-      draggableElement.tile.state = TileState.NONE;
+      draggableElement.tile.state = TileState.USERDRAGGING;
       draggableElement.tile.animation.timeStampStart = 0;
     }
   }
