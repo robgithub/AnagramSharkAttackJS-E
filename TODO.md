@@ -1,4 +1,4 @@
-This is the TODO list for Anagram Shark Attack JS-E
+#This is the TODO list for Anagram Shark Attack JS-E
 
 GitHub repo and Push [X]
 
@@ -12,7 +12,7 @@ Code: placeholder created
 CSS: placholder created
   Handles ALL sizing requirements
 
-Assets/components:
+###Assets/components:
   Waves [X]
   Letter Tile template [X] 
   Clouds [X]
@@ -63,7 +63,7 @@ Concentrating on the tiles;
   Calcuate width with no restriction, if result is greater than Max (based on height) the width is Max
    - now calculate spacing as a percentage and apply 
 
-Game play:
+##Game play:
   Start button [ ]
   Word selection per level [X]
   calculate letter positions [X]
@@ -81,9 +81,7 @@ Game play:
   new level [ ]
   level indicator [ ]
 
-
-
-Post launch ideas.
+##Post launch ideas.
 
 Sharks drop from the sky
 Sharks do parabolic leaps from the edges
@@ -94,4 +92,17 @@ Switch sharks for land based animal
 Switch sharks for grabbing hand
 Switch sharks for Unicorns
 Switch waves for dessert - sweets
+
+
+##Current issues
+
+[ ]tiles get stuck in repeatedly unsettled state.
+  more apparent on later levels with more tiles.
+  [ ] what logic is in place currently
+    could it be the edge is reached and seen as the closest?
+    there are two possible requirements
+        bump - which wasn't 100% due to odd rounding issues
+        and - drop - which was working 100% and then I broke it :D
+  [ ] where does this logic break down
+  [ ] fix :D
 
