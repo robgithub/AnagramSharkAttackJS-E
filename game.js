@@ -75,7 +75,7 @@ function Game(name, targetDiv) {
         // this is animatable tile has it got a timeStampStart yet?
         if (tile.animation.timeStampStart == 0) {
             tile.animation.timeStampStart = timeStamp; // record the initial frame the animation starts
-            tile.animation.duration = 2 * 1000; // 2 seconds
+            tile.animation.duration = 2 * 200; // .2 seconds
             tile.animation.fromPosition = {x:parseFloat(tile.element.style.left.slice(0,-2)), y:parseFloat(tile.element.style.top.slice(0,-2))}; // record the start position as numbers
             tile.animation.toPosition = game.getClosestTilePosition(tilePositions, tile.animation.fromPosition.x, restY, tileSize, null);
             // calculate the distance to the toPosition, as this is the path we want to animate.
@@ -137,7 +137,7 @@ function Game(name, targetDiv) {
         // this is animatable tile has it got a timeStampStart yet?
         if (tile.animation.timeStampStart == 0) {
             tile.animation.timeStampStart = timeStamp; // record the initial frame the animation starts 
-            tile.animation.duration = (1 * 1000); // seconds
+            tile.animation.duration = (1 * 500); // .5 seconds
             tile.animation.fromPosition.y = parseFloat(tile.element.style.top.slice(0,-2)); // record the start position as numbers
             tile.animation.toPosition.y = 0 - (tileSize.h * 1.5);
             // calculate the distance to the toPosition, as this is the path we want to animate.
@@ -219,7 +219,7 @@ function Game(name, targetDiv) {
                     // found a tile that needs animating
                     // find nearest hole
                     // set up animation towards it
-                    tile.animation.duration = 2 * 1000; // 2 seconds
+                    tile.animation.duration = 2 * 200; // .2 seconds
                     tile.animation.fromPosition = {x:parseFloat(tile.element.style.left.slice(0,-2)), y:parseFloat(tile.element.style.top.slice(0,-2))}; // record the start position as numbers
                     tile.animation.toPosition = game.getClosestTilePosition(tilePositions, tile.animation.fromPosition.x, restY, tileSize, tile.animation.fromPosition, holes, index);
                     tile.animation.toDistance.x = tile.animation.toPosition.x - tile.animation.fromPosition.x;

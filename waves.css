@@ -1,0 +1,37 @@
+#waves-container{
+  position:absolute;
+  top:55mm;
+}
+#wave1 {
+  z-index:10;
+  top:0mm;
+}
+#wave2 {
+  top:22mm;
+  z-index:4;
+}
+#wave3 {
+  top:0mm;
+  z-index:3;
+}
+#wave1 .wave-path {
+  animation: wave-rotate 5s linear infinite both;
+  transform-origin: 50% 50%;
+}
+#wave2 .wave-path {
+  animation: wave-rotate 7s linear infinite both;
+  animation-delay: 0.5s;
+  transform-origin: 50% 50%;
+}
+#wave3 .wave-path {
+  animation: wave-rotate 10s linear infinite both;
+  animation-delay: 1s;
+  transform-origin: 50% 50%;
+}
+@keyframes wave-rotate {
+  0%   { transform: rotate(-1deg);}
+  25%   { transform: rotate(0deg);}
+  50% { transform: rotate(1deg);}
+  75%   { transform: rotate(-0deg);}
+  100% { transform: rotate(-1deg);}
+}

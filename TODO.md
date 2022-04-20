@@ -96,13 +96,34 @@ Switch waves for dessert - sweets
 
 ##Current issues
 
-[ ]tiles get stuck in repeatedly unsettled state.
+[X]tiles get stuck in repeatedly unsettled state.
   more apparent on later levels with more tiles.
-  [ ] what logic is in place currently
+  [X] what logic is in place currently
     could it be the edge is reached and seen as the closest?
     there are two possible requirements
         bump - which wasn't 100% due to odd rounding issues
         and - drop - which was working 100% and then I broke it :D
-  [ ] where does this logic break down
-  [ ] fix :D
+  [X] where does this logic break down
+  [X] fix :D
+  
+[ ]Add the clouds
+[ ]Add the waves
+[ ]Add the radar
+[ ]Add the sharks
+[ ]Add game over 
+[ ]Add title screen
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
 
