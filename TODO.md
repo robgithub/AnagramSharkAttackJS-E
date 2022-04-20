@@ -105,8 +105,11 @@ Switch waves for dessert - sweets
         and - drop - which was working 100% and then I broke it :D
   [X] where does this logic break down
   [X] fix :D
+
+[ ]Fix new sized playarea 4 - tiles are not bumping
   
 [ ]Add the clouds
+  [ ]for each container
 [ ]Add the waves
 [ ]Add the radar
 [ ]Add the sharks

@@ -18,6 +18,17 @@
         height:280px;
         left:802px;
       }
+      #playarea3 {
+        width:800px;
+        height:240px;
+        top:602px;
+      }
+      #playarea4 {
+        width:240px;
+        height:562px;
+        left:802px;
+        top:282px;
+      }
     </style>
     <link rel="stylesheet" type="text/css" href="game.css" />
     <link rel="stylesheet" type="text/css" href="clouds.css" />
@@ -49,13 +60,19 @@
 </div>
   
       
-    <div id="playarea">Play area 1 v0.14</div>
-    <div id="playarea2">Play area 2 v0.14</div>
+    <div id="playarea">Play area 1 v0.2</div> 
+    <div id="playarea2">Play area 2 v0.2</div>
+    <div id="playarea3">Play area 3 v0.2</div>
+    <div id="playarea4">Play area 4 v0.2</div>
     <script type='text/javascript'>
-      var game1 = new Game("Anagram Shark Attack JS-E", "#playarea");
+      var game1 = new Game("Anagram Shark Attack JS-E P1", "#playarea");
       game1.start();
-      var game2 = new Game("Anagram Shark Attack JS-E", "#playarea2");
+      var game2 = new Game("Anagram Shark Attack JS-E P2", "#playarea2");
       game2.start();
+      var game3 = new Game("Anagram Shark Attack JS-E P3", "#playarea3");
+      game3.start();
+      var game4 = new Game("Anagram Shark Attack JS-E P4", "#playarea4");
+      game4.start();
     </script>
   </body>
 </html>
