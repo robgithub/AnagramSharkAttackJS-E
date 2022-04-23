@@ -1,0 +1,30 @@
+#cloud-container {
+  position:relative;
+  left:-300px;      
+}
+#cloud1 {
+  animation: cloud-drift1 120s linear infinite;
+  animation-delay: -30s;
+  top:100px;
+}
+#cloud2 {
+  top:1px;
+  animation: cloud-drift2 65s linear infinite both;
+  animation-delay: -30s;
+}
+#cloud3 {
+  animation: cloud-drift3 40s linear infinite both;
+  animation-delay: -30s;
+}
+@keyframes cloud-drift1 {
+  from { left:0%;}
+  to { left:100%;}
+}
+@keyframes cloud-drift2 {
+  from { left:0%;}
+  to { left:100%;}
+}
+@keyframes cloud-drift3 {
+  from { left:0%;}
+  to { left:100%;}
+}
