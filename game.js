@@ -18,6 +18,7 @@ function Game(name, targetDiv) {
   const words = [ ['fish','boat','ship','crab','tuna'], ['ocean','whale','shark','waves','shrimp' ], ['lobster','dolphin','octopus','seaweed','penguin' ], ['barnacle','seasnake','morayeel','mantaray','flyingfish' ], ['jellyfish','clownfish','bluewhale','swordfish','nautilus' ], ['pufferfish','coelacanth','nudibranch','bobbitworm','giantclam' ] ];
   let tilePositions = [];  // where tiles can be and what state each position is
   let restY = 40; // Resting position of the tiles, percentage
+  let tileTop = -1; // for when restY creates a non whole number
   let maxTileSize = null; // to be calculated
   let tileSize = null; // to be calculated
   const baseTileZIndex = 10;
@@ -51,6 +52,7 @@ function Game(name, targetDiv) {
     logger.debug(0, "The word ["+ word +"] is shuffled as [" + shuffled + "]");
     // Word has been selected and shuffled
     let playArea = document.querySelector(game.targetDiv).getBoundingClientRect(); // Get the play area to determine the Tile size
+    tileTop = Math.round( (restY / 100) * playArea.height );
     let tilePadding = 2; // TODO:: revisit, percentage of tile?
     maxTileSize = game.calculateMaxTileSize(playArea.width, word.length, tilePadding); // based on play area, word length and tile padding, work out the maximum possible tile size
     logger.debug(3, "calculateMaxTileSize() returned [" + maxTileSize + "]");
@@ -77,7 +79,7 @@ function Game(name, targetDiv) {
             tile.animation.timeStampStart = timeStamp; // record the initial frame the animation starts
             tile.animation.duration = 2 * 200; // .2 seconds
             tile.animation.fromPosition = {x:parseFloat(tile.element.style.left.slice(0,-2)), y:parseFloat(tile.element.style.top.slice(0,-2))}; // record the start position as numbers
-            tile.animation.toPosition = game.getClosestTilePosition(tilePositions, tile.animation.fromPosition.x, restY, tileSize, null);
+            tile.animation.toPosition = game.getClosestTilePosition(tilePositions, tile.animation.fromPosition.x, tileTop, tileSize, null);
             // calculate the distance to the toPosition, as this is the path we want to animate.
             tile.animation.toDistance.x = tile.animation.toPosition.x - tile.animation.fromPosition.x;
             tile.animation.toDistance.y = tile.animation.toPosition.y - tile.animation.fromPosition.y;
@@ -221,7 +223,7 @@ function Game(name, targetDiv) {
                     // set up animation towards it
                     tile.animation.duration = 2 * 200; // .2 seconds
                     tile.animation.fromPosition = {x:parseFloat(tile.element.style.left.slice(0,-2)), y:parseFloat(tile.element.style.top.slice(0,-2))}; // record the start position as numbers
-                    tile.animation.toPosition = game.getClosestTilePosition(tilePositions, tile.animation.fromPosition.x, restY, tileSize, tile.animation.fromPosition, holes, index);
+                    tile.animation.toPosition = game.getClosestTilePosition(tilePositions, tile.animation.fromPosition.x, tileTop, tileSize, tile.animation.fromPosition, holes, index);
                     tile.animation.toDistance.x = tile.animation.toPosition.x - tile.animation.fromPosition.x;
                     tile.animation.toDistance.y = tile.animation.toPosition.y - tile.animation.fromPosition.y;
                     tile.state = TileState.GAMEBUMPED; // will get picked up in the next animation frame
@@ -345,16 +347,16 @@ function Game(name, targetDiv) {
     let x = (playArea.width - ((tileWidth + tilePadding) * word.length)) /2;
     logger.debug(2, "calculateTilePositions() playArea.width = [" + playArea.width + "] initial x = [" + x + "]");
     let positions = [];
-    positions.push(new TilePosition(Math.round(x), Math.round( (restY / 100) * playArea.height ))); 
+    positions.push(new TilePosition(Math.round(x), tileTop)); 
     for (let i = 1; i < word.length; i++) {
       x += tileWidth + tilePadding
-      positions.push(new TilePosition(Math.round(x), Math.round((restY / 100) * playArea.height) ));
+      positions.push(new TilePosition(Math.round(x), tileTop ));
     }
     return positions;
   }
   
   // when a tile is bumped we want the direction to the nearest hole for the precesion of affected tiles to travel in
-  game.getClosestHolePosition = function(tilePositions, x, restY, tileSize, excludePosition, holes, excludeIndex) {
+  game.getClosestHolePosition = function(tilePositions, x, tileTop, tileSize, excludePosition, holes, excludeIndex) {
       let newTileIndex = excludeIndex;
       // Step 1: find closest hole (by index)
       // to the left
@@ -412,11 +414,11 @@ function Game(name, targetDiv) {
   // for animating tiles and them homing-in on the correct tile column
   // for tile bumping i.e. when a tile is already in "a" position include parameter excludePosition
   // if holes are supplied prefer them
-  game.getClosestTilePosition = function(tilePositions, x, restY, tileSize, excludePosition, holes, bumpIndex) {
+  game.getClosestTilePosition = function(tilePositions, x, tileTop, tileSize, excludePosition, holes, bumpIndex) {
     let playArea = document.querySelector(game.targetDiv).getBoundingClientRect(); // TODO: really don't like this global
-    let closest = {x:"-1000", y:( (restY / 100) * playArea.height )}; /* record the destination position */
+    let closest = {x:"-1000", y:tileTop}; /* record the destination position */
     if (bumpIndex) {
-        closest.x = game.getClosestHolePosition(tilePositions, x, restY, tileSize, excludePosition, holes, bumpIndex);
+        closest.x = game.getClosestHolePosition(tilePositions, x, tileTop, tileSize, excludePosition, holes, bumpIndex);
         return closest;
     }
     let closestPosition = {index:-1, distance:Number.MAX_SAFE_INTEGER };
