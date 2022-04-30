@@ -106,10 +106,15 @@ Switch waves for dessert - sweets
   [X] where does this logic break down
   [X] fix :D
 
-[ ]Fix new sized playarea 4 - tiles are not bumping
+[x]Fix new sized playarea 4 - tiles are not bumping
+  - Was a percentage presision thing, stopped constantly recalculating
   
 [ ]Add the clouds
   [ ]for each container
+  [ ]fit to containers
+    100% 500px 0 0 100 100
+    either need to nest and animated the internal or instigate a clipping plane
+    .svgs can be loaded via <img src="my.svg">
 [ ]Add the waves
 [ ]Add the radar
 [ ]Add the sharks
