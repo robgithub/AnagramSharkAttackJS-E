@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en-GB" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Anagram Shark Attack JS-E</title>
+    <script type='text/javascript'>
+    function start() {
+        svr_uri = './assets/sonar.svg'
+       
+        xhr = new XMLHttpRequest();
+        xhr.open("GET",svr_uri,false);
+        // Following line is just to be on the safe side;
+        // not needed if your server delivers SVG with correct MIME type
+        xhr.overrideMimeType("image/svg+xml");
+        xhr.onload = function(e) {
+          // You might also want to check for xhr.readyState/xhr.status here
+          document.getElementById("playarea")
+            .appendChild(xhr.responseXML.documentElement);
+        };
+        xhr.send();
+    }
+
+    </script>
+   </head>
+  <body>
+    <div id="playarea">Play area 1 v0.2</div> 
+    <script type='text/javascript'>
+      start();
+    </script>
+  </body>
+</html>

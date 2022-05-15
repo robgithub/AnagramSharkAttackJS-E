@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en-GB" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Anagram Shark Attack JS-E </title>
+    <style>
+        body {
+            background-color:brown;
+        }
+        #playarea {
+            width:300px;
+            height:300px;
+            border: blue 3px solid;
+        }
+    </style>
+    <script src="./svg_loader.js"></script>
+    <script>
+    var debug_el;
+    
+    function start() {
+        let myLoader = new svgLoader();
+        myLoader.load_svg('./assets/sonar.svg', 'sonar', 
+        (name, data) => {
+                let svg_element = document.getElementById("playarea").appendChild(data);
+                update_viewbox(svg_element);
+            }, 
+        (name, xhr) => {
+                console.log('xhr load failed for ' + name);
+                console.log(xhr);
+            }
+        );
+    }
+
+    function update_viewbox(element){
+        console.log('got loaded element for manipulation');
+        debug_el = element;
+        // set the actual SVG size before changing the zoom in the viewBox
+        element.setAttribute("width", "300px");
+        element.setAttribute("height", "300px");
+        // set the offset to 0,0 (increases shift right, decreases shift left)
+        element.viewBox.baseVal.x = 20;
+        element.viewBox.baseVal.y = 40;
+        // set the size relative to the SVG viewport
+        element.viewBox.baseVal.width = 75;
+        element.viewBox.baseVal.height = 75;
+    }
+
+    </script>
+   </head>
+  <body>
+      <h3>Play area 1 v0.2</h3>
+    <div id="playarea"></div> 
+    <script type='text/javascript'>
+      start();
+    </script>
+  </body>
+</html>

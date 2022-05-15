@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en-GB" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Anagram Shark Attack JS-E </title>
+    <script src="./svg_loader.js"></script>
+    <script>
+    
+    function start() {
+        let myLoader = new svgLoader();
+        myLoader.load_svg('./assets/sonar.svg', 'sonar', 
+        (name, data) => {
+                document.getElementById("playarea").appendChild(data);
+            }, 
+        (name, xhr) => {
+                console.log('xhr load failed for ' + name);
+                console.log(xhr);
+            }
+        );
+    }
+
+
+    function test() {
+        let myLoader = new svgLoader();
+        myLoader.load_all([{'uri' : './assets/sonar.svg', 'name' : 'sonar'}, {'uri' : './assets/Idontexist.svg', 'name' : 'failtoloadtest'}]);
+    }
+
+    </script>
+   </head>
+  <body>
+    <div id="playarea">Play area 1 v0.2</div> 
+    <script type='text/javascript'>
+      start();
+      test();
+    </script>
+  </body>
+</html>

@@ -114,7 +114,12 @@ Switch waves for dessert - sweets
   [ ]fit to containers
     100% 500px 0 0 100 100
     either need to nest and animated the internal or instigate a clipping plane
-    .svgs can be loaded via <img src="my.svg">
+    .svgs can be loaded via <img src="my.svg"> or xhr
+    svgs are loaded with the viewboxes defined in their files.
+    [x] load svg into div
+    [x] change viewbox via script
+    [x] change viewport via script
+    
 [ ]Add the waves
 [ ]Add the radar
 [ ]Add the sharks
