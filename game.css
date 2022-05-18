@@ -110,3 +110,7 @@
 svg {
   position:absolute;
 }
+
+svg.svg-relative {
+  position:relative;
+}

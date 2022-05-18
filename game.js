@@ -35,10 +35,43 @@ function Game(name, targetDiv) {
 
   // Public START method
   game.start = function() {
-    logger.debug(0, "it has begun");
+    logger.debug(0, "it has begun!");
+    game.addClouds();
     // create game loop for animations
     game.animate();
     game.newLevel();
+  }
+  
+  game.addClouds = function() {
+        let myLoader = new svgLoader();
+        let key = 'cloud1';
+        myLoader.load_svg('./assets/cloud1.svg', key, 
+        (name, data) => {
+                game.processSvg(name, data);
+            }, 
+        (name, xhr) => {
+                console.log('xhr load failed for ' + name);
+                console.log(xhr);
+            }
+        );
+  }
+  
+  game.processSvg = function(name, data) {
+    let svg_element = document.querySelector(game.targetDiv).appendChild(data);
+    console.log('loaded:' + name);
+    
+    svg_element.classList.add('svg-relative');
+    
+    let playArea = document.querySelector(game.targetDiv).getBoundingClientRect();
+    // set the actual SVG size before changing the zoom in the viewBox
+    svg_element.setAttribute("width", "" + playArea.width + "px");
+    svg_element.setAttribute("height", "" + playArea.height + "px");
+    // set the offset to 0,0 (increases shift right, decreases shift left)
+    svg_element.viewBox.baseVal.x = 20;
+    svg_element.viewBox.baseVal.y = 40;
+    // set the size relative to the SVG viewport
+    svg_element.viewBox.baseVal.width = 75;
+    svg_element.viewBox.baseVal.height = 75;
   }
   
   // initiate a new level - will destroy all the previous elements if they exist

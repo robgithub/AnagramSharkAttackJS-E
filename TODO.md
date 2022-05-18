@@ -110,8 +110,8 @@ Switch waves for dessert - sweets
   - Was a percentage presision thing, stopped constantly recalculating
   
 [ ]Add the clouds
-  [ ]for each container
-  [ ]fit to containers
+  [x]for each container
+  [x]fit to containers
     100% 500px 0 0 100 100
     either need to nest and animated the internal or instigate a clipping plane
     .svgs can be loaded via <img src="my.svg"> or xhr
@@ -119,12 +119,16 @@ Switch waves for dessert - sweets
     [x] load svg into div
     [x] change viewbox via script
     [x] change viewport via script
+  [ ] x3 clouds
     
 [ ]Add the waves
 [ ]Add the radar
 [ ]Add the sharks
 [ ]Add game over 
 [ ]Add title screen
+
+[ ]Loader for svgs "digging, filling, adding sharks ...."
+[ ]check the perspective value in the game.css and how it changes with the different play area sizes
 
 
 
