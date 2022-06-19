@@ -66,7 +66,6 @@ function Game(name, targetDiv) {
   }
   
   game.processSvg = function(name, data) {
-    logger.debug(0, 'loaded svg:' + name);
     let svg_element = document.querySelector(game.targetDiv + ' .cloud-container').appendChild(data);
     svg_element.classList.add("svg-" + name);
     let playArea = document.querySelector(game.targetDiv).getBoundingClientRect();
@@ -81,15 +80,25 @@ function Game(name, targetDiv) {
     svg_element.viewBox.baseVal.height = cloud_svg_viewbox[name].base.height;
     // randomise the animation of the cloud
     let anim = svg_element.querySelector("animateTransform");
-    anim.setAttribute("begin", Random.getRandomRange(0, 10).toFixed(2).toString() + "s");
-    anim.setAttribute("dur", Random.getRandomRange(10, 20).toFixed(2).toString() + "s");
-    setTimeout((element) => { 
-        let t = element.getCurrentTime();
-        console.log(t); 
-        if (t != 0) {
-            console.log('kick starting animation');
-            element.beginElement();
-        }}, 2000, anim);
+    //anim.setAttribute("begin", Random.getRandomRange(0, 10).toFixed(2).toString() + "s");
+    //anim.setAttribute("dur", Random.getRandomRange(10, 20).toFixed(2).toString() + "s");
+    // after 2 seconds check if the animation is running
+    setTimeout((animation, element, key, instance) => { 
+        let t = animation.getCurrentTime();
+        if (t == 0) {
+            // remove the svg element and reload
+            // tried to update the animateTransform and svg animations and nothing would work.
+            // might be able to remove and re-add just the animationTransform in its entirety
+            // nope, nor removing all the SVG content and re-adding
+            // what about removing the entire svg element?
+            console.log('kick starting animation ' + name + ' ' + instance); 
+            var animation_new = element.outerHTML;
+            element.remove();
+            console.log("new:" + name + ' ' + instance);
+            setTimeout((target, anim) => {
+                target.insertAdjacentHTML( 'beforeend', anim) ;
+            }, 200, document.querySelector(instance + ' .cloud-container'), animation_new);
+        }}, 200, anim, svg_element, name, game.targetDiv);
   }
   
   game.initPlayarea = function() {
