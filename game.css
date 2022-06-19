@@ -107,7 +107,7 @@
     color: #fff;
 }
 
-svg {
+svg, .area-label {
   position:absolute;
 }
 

@@ -6,6 +6,7 @@
   animation: cloud-drift1 120s linear infinite;
   animation-delay: -30s;
   top:100px;
+  border: 4px dashed red;
 }
 .cloud2 {
   top:1px;

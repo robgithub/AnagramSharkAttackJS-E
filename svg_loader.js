@@ -1,6 +1,8 @@
 
 function svgLoader() {
     let svgLoader = this;
+    
+    // TODO: remove the load_all to documentation for reference
     svgLoader.svg_elements = {};
      
     svgLoader.load_all = function (svgs) {

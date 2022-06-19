@@ -131,6 +131,11 @@ Switch waves for dessert - sweets
 [ ]check the perspective value in the game.css and how it changes with the different play area sizes
 
 
+tweaks
+cloud stroke size
+cloud random starts and durations
+
+
 
 
 

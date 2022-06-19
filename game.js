@@ -22,6 +22,12 @@ function Game(name, targetDiv) {
   let maxTileSize = null; // to be calculated
   let tileSize = null; // to be calculated
   const baseTileZIndex = 10;
+  
+  const cloud_svg_viewbox = { 
+      "cloud1" : { "base" : { "x" : 20, "y" : 40, "width" : 75, "height" : 75 }},
+      "cloud2" : { "base" : { "x" : 20, "y" : 0, "width" : 175, "height" : 175 }},
+      "cloud3" : { "base" : { "x" : 20, "y" : 40, "width" : 75, "height" : 75 }}
+  };
 
   // example debug to return the instance of a tiles, otherwise everything is private
   // example when code running game1.surfaceTiles();
@@ -44,34 +50,35 @@ function Game(name, targetDiv) {
   
   game.addClouds = function() {
         let myLoader = new svgLoader();
-        let key = 'cloud1';
-        myLoader.load_svg('./assets/cloud1.svg', key, 
-        (name, data) => {
-                game.processSvg(name, data);
-            }, 
-        (name, xhr) => {
-                console.log('xhr load failed for ' + name);
-                console.log(xhr);
-            }
-        );
+        let element_keys = ['cloud1', 'cloud2', 'cloud3'];
+        element_keys.forEach((key) => {
+            myLoader.load_svg('./assets/' + key + '.svg', key, 
+                (name, data) => {
+                        game.processSvg(name, data);
+                    }, 
+                (name, xhr) => {
+                        logger.debug(0, 'xhr load failed for ' + name);
+                        logger.debug(0, xhr);
+                    }
+                );
+        });
   }
   
   game.processSvg = function(name, data) {
+    logger.debug(0, 'loaded svg:' + name);
     let svg_element = document.querySelector(game.targetDiv).appendChild(data);
-    console.log('loaded:' + name);
-    
-    svg_element.classList.add('svg-relative');
+    svg_element.classList.add("svg-" + name);
     
     let playArea = document.querySelector(game.targetDiv).getBoundingClientRect();
-    // set the actual SVG size before changing the zoom in the viewBox
-    svg_element.setAttribute("width", "" + playArea.width + "px");
-    svg_element.setAttribute("height", "" + playArea.height + "px");
+    // set the actual SVG element size before changing the zoom in the viewBox
+    svg_element.setAttribute("width", playArea.width.toString() + "px");
+    svg_element.setAttribute("height", playArea.height.toString() + "px");
     // set the offset to 0,0 (increases shift right, decreases shift left)
-    svg_element.viewBox.baseVal.x = 20;
-    svg_element.viewBox.baseVal.y = 40;
+    svg_element.viewBox.baseVal.x = cloud_svg_viewbox[name].base.x;
+    svg_element.viewBox.baseVal.y = cloud_svg_viewbox[name].base.y;
     // set the size relative to the SVG viewport
-    svg_element.viewBox.baseVal.width = 75;
-    svg_element.viewBox.baseVal.height = 75;
+    svg_element.viewBox.baseVal.width = cloud_svg_viewbox[name].base.width;
+    svg_element.viewBox.baseVal.height = cloud_svg_viewbox[name].base.height;
   }
   
   // initiate a new level - will destroy all the previous elements if they exist
@@ -498,7 +505,7 @@ function Tile(letter, id, pos, size, zIndex) {
   
   tile.create = function() {
     let element = document.createElement('div');
-    element.className = "tile no-select letter-" + tile.letter +" tile-" + tile.id + "";
+    element.className = "tile no-select letter-" + tile.letter +" tile-" + tile.id.toString();
     element.setAttribute("style","left:" + tile.pos.x + "px;top:" + tile.pos.y + "px;width:" + tile.size.w + "px;height:" + tile.size.h + "px");
     element.style.zIndex = zIndex;
     let innerElement = document.createElement('div');
