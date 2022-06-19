@@ -119,7 +119,7 @@ Switch waves for dessert - sweets
     [x] load svg into div
     [x] change viewbox via script
     [x] change viewport via script
-  [ ] x3 clouds
+  [x] x3 clouds
     
 [ ]Add the waves
 [ ]Add the radar
@@ -133,7 +133,7 @@ Switch waves for dessert - sweets
 
 tweaks
 cloud stroke size
-cloud random starts and durations
+[x]cloud random starts and durations
 
 
 

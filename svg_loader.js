@@ -20,10 +20,10 @@ function svgLoader() {
     }
  
     svgLoader.load_svg = function (uri, name, callback, error_callback) {
-        xhr = new XMLHttpRequest();
-        xhr.open("GET", uri, false);
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", uri, true);
         xhr.overrideMimeType("image/svg+xml");
-        xhr.onload = function(e) {
+        xhr.onreadystatechange = function(e) {
           if (xhr.readyState == 4) {
             if (xhr.status == 200 ) {
                 callback(name, xhr.responseXML.documentElement); 
@@ -33,5 +33,6 @@ function svgLoader() {
           }
         };
         xhr.send();
+        return xhr;
     }
 }

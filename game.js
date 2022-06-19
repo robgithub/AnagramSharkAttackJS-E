@@ -41,6 +41,7 @@ function Game(name, targetDiv) {
 
   // Public START method
   game.start = function() {
+    game.initPlayarea();
     logger.debug(0, "it has begun!");
     game.addClouds();
     // create game loop for animations
@@ -66,9 +67,8 @@ function Game(name, targetDiv) {
   
   game.processSvg = function(name, data) {
     logger.debug(0, 'loaded svg:' + name);
-    let svg_element = document.querySelector(game.targetDiv).appendChild(data);
+    let svg_element = document.querySelector(game.targetDiv + ' .cloud-container').appendChild(data);
     svg_element.classList.add("svg-" + name);
-    
     let playArea = document.querySelector(game.targetDiv).getBoundingClientRect();
     // set the actual SVG element size before changing the zoom in the viewBox
     svg_element.setAttribute("width", playArea.width.toString() + "px");
@@ -79,6 +79,25 @@ function Game(name, targetDiv) {
     // set the size relative to the SVG viewport
     svg_element.viewBox.baseVal.width = cloud_svg_viewbox[name].base.width;
     svg_element.viewBox.baseVal.height = cloud_svg_viewbox[name].base.height;
+    // randomise the animation of the cloud
+    let anim = svg_element.querySelector("animateTransform");
+    anim.setAttribute("begin", Random.getRandomRange(0, 10).toFixed(2).toString() + "s");
+    anim.setAttribute("dur", Random.getRandomRange(10, 20).toFixed(2).toString() + "s");
+    setTimeout((element) => { 
+        let t = element.getCurrentTime();
+        console.log(t); 
+        if (t != 0) {
+            console.log('kick starting animation');
+            element.beginElement();
+        }}, 2000, anim);
+  }
+  
+  game.initPlayarea = function() {
+    let playarea = document.querySelector(game.targetDiv);
+    playarea.classList.add('playarea-container');
+    let cloudLayer = document.createElement('div');
+    cloudLayer.classList.add('cloud-container');
+    playarea.append(cloudLayer);
   }
   
   // initiate a new level - will destroy all the previous elements if they exist
