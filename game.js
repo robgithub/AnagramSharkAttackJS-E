@@ -22,6 +22,12 @@ function Game(name, targetDiv) {
   let maxTileSize = null; // to be calculated
   let tileSize = null; // to be calculated
   const baseTileZIndex = 10;
+  
+  const cloud_svg_viewbox = { 
+      "cloud1" : { "base" : { "x" : 20, "y" : 40, "width" : 75, "height" : 75 }},
+      "cloud2" : { "base" : { "x" : 20, "y" : 0, "width" : 175, "height" : 175 }},
+      "cloud3" : { "base" : { "x" : 20, "y" : 40, "width" : 75, "height" : 75 }}
+  };
 
   // example debug to return the instance of a tiles, otherwise everything is private
   // example when code running game1.surfaceTiles();
@@ -35,10 +41,72 @@ function Game(name, targetDiv) {
 
   // Public START method
   game.start = function() {
-    logger.debug(0, "it has begun");
+    game.initPlayarea();
+    logger.debug(0, "it has begun!");
+    game.addClouds();
     // create game loop for animations
     game.animate();
     game.newLevel();
+  }
+  
+  game.addClouds = function() {
+        let myLoader = new svgLoader();
+        let element_keys = ['cloud1', 'cloud2', 'cloud3'];
+        element_keys.forEach((key) => {
+            myLoader.load_svg('./assets/' + key + '.svg', key, 
+                (name, data) => {
+                        game.processSvg(name, data);
+                    }, 
+                (name, xhr) => {
+                        logger.debug(0, 'xhr load failed for ' + name);
+                        logger.debug(0, xhr);
+                    }
+                );
+        });
+  }
+  
+  game.processSvg = function(name, data) {
+    let svg_element = document.querySelector(game.targetDiv + ' .cloud-container').appendChild(data);
+    svg_element.classList.add("svg-" + name);
+    let playArea = document.querySelector(game.targetDiv).getBoundingClientRect();
+    // set the actual SVG element size before changing the zoom in the viewBox
+    svg_element.setAttribute("width", playArea.width.toString() + "px");
+    svg_element.setAttribute("height", playArea.height.toString() + "px");
+    // set the offset to 0,0 (increases shift right, decreases shift left)
+    svg_element.viewBox.baseVal.x = cloud_svg_viewbox[name].base.x;
+    svg_element.viewBox.baseVal.y = cloud_svg_viewbox[name].base.y;
+    // set the size relative to the SVG viewport
+    svg_element.viewBox.baseVal.width = cloud_svg_viewbox[name].base.width;
+    svg_element.viewBox.baseVal.height = cloud_svg_viewbox[name].base.height;
+    // randomise the animation of the cloud
+    let anim = svg_element.querySelector("animateTransform");
+    //anim.setAttribute("begin", Random.getRandomRange(0, 10).toFixed(2).toString() + "s");
+    //anim.setAttribute("dur", Random.getRandomRange(10, 20).toFixed(2).toString() + "s");
+    // after 2 seconds check if the animation is running
+    setTimeout((animation, element, key, instance) => { 
+        let t = animation.getCurrentTime();
+        if (t == 0) {
+            // remove the svg element and reload
+            // tried to update the animateTransform and svg animations and nothing would work.
+            // might be able to remove and re-add just the animationTransform in its entirety
+            // nope, nor removing all the SVG content and re-adding
+            // what about removing the entire svg element?
+            console.log('kick starting animation ' + name + ' ' + instance); 
+            var animation_new = element.outerHTML;
+            element.remove();
+            console.log("new:" + name + ' ' + instance);
+            setTimeout((target, anim) => {
+                target.insertAdjacentHTML( 'beforeend', anim) ;
+            }, 200, document.querySelector(instance + ' .cloud-container'), animation_new);
+        }}, 200, anim, svg_element, name, game.targetDiv);
+  }
+  
+  game.initPlayarea = function() {
+    let playarea = document.querySelector(game.targetDiv);
+    playarea.classList.add('playarea-container');
+    let cloudLayer = document.createElement('div');
+    cloudLayer.classList.add('cloud-container');
+    playarea.append(cloudLayer);
   }
   
   // initiate a new level - will destroy all the previous elements if they exist
@@ -465,7 +533,7 @@ function Tile(letter, id, pos, size, zIndex) {
   
   tile.create = function() {
     let element = document.createElement('div');
-    element.className = "tile no-select letter-" + tile.letter +" tile-" + tile.id + "";
+    element.className = "tile no-select letter-" + tile.letter +" tile-" + tile.id.toString();
     element.setAttribute("style","left:" + tile.pos.x + "px;top:" + tile.pos.y + "px;width:" + tile.size.w + "px;height:" + tile.size.h + "px");
     element.style.zIndex = zIndex;
     let innerElement = document.createElement('div');

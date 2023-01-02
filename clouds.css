@@ -1,18 +1,19 @@
-#cloud-container {
+#cloud-containerX {
   position:relative;
   left:-300px;      
 }
-#cloud1 {
+.cloud1 {
   animation: cloud-drift1 120s linear infinite;
   animation-delay: -30s;
   top:100px;
+  border: 4px dashed red;
 }
-#cloud2 {
+.cloud2 {
   top:1px;
   animation: cloud-drift2 65s linear infinite both;
   animation-delay: -30s;
 }
-#cloud3 {
+.cloud3 {
   animation: cloud-drift3 40s linear infinite both;
   animation-delay: -30s;
 }
