@@ -128,6 +128,9 @@ Colour palette for clouds to allow fow sunset/rise
   [x] ensure all clouds completely exit the screen before disappearing
     
 [ ]Add the waves
+    [x] generise the processSvg function
+    [ ] add function
+
 [ ]Add the radar
 [ ]Add the sharks
 [ ]Add game over 
@@ -139,9 +142,10 @@ Colour palette for clouds to allow fow sunset/rise
 
 tweaks/issues
 [ ]cloud stroke size
-[ ]clouds of a smaller size don't make it all the way across the play area
+[x]clouds of a smaller size don't make it all the way across the play area
 [x]cloud random starts and durations
 [ ]tile animataions go out of the play area
+[ ]use const in most places that are currently "let"
 
 
 

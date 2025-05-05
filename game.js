@@ -23,10 +23,13 @@ function Game(name, targetDiv) {
   let tileSize = null; // to be calculated
   const baseTileZIndex = 10;
   
-  const cloud_svg_viewbox = { 
+  const svg_viewboxes = { 
       "cloud1" : { "base" : { "x" : 20, "y" : 40, "width" : 75, "height" : 75 }},
       "cloud2" : { "base" : { "x" : 20, "y" : 0, "width" : 175, "height" : 175 }},
-      "cloud3" : { "base" : { "x" : 20, "y" : 40, "width" : 75, "height" : 75 }}
+      "cloud3" : { "base" : { "x" : 20, "y" : 40, "width" : 75, "height" : 75 }},
+      "wave1" : { "base" : { "x" : 20, "y" : 40, "width" : 75, "height" : 75 }},
+      "wave2" : { "base" : { "x" : 20, "y" : 0, "width" : 175, "height" : 175 }},
+      "wave3" : { "base" : { "x" : 20, "y" : 40, "width" : 75, "height" : 75 }}
   };
 
   // example debug to return the instance of a tiles, otherwise everything is private
@@ -43,19 +46,31 @@ function Game(name, targetDiv) {
   game.start = function() {
     game.initPlayarea();
     logger.debug(0, "it has begun!");
-    game.addClouds();
+    const mySvgLoader = new svgLoader();
+    game.addClouds(mySvgLoader);
+    game.addWaves(mySvgLoader);
     // create game loop for animations
     game.animate();
     game.newLevel();
   }
   
-  game.addClouds = function() {
-        let myLoader = new svgLoader();
-        let element_keys = ['cloud1', 'cloud2', 'cloud3'];
-        element_keys.forEach((key) => {
-            myLoader.load_svg('./assets/' + key + '.svg', key, 
+  game.addClouds = function(loader) {
+    const containerClass = '.cloud-container';
+    const elementKeys = ['cloud1', 'cloud2', 'cloud3'];
+    game.addSvg(loader, containerClass, elementKeys);
+  }
+
+  game.addWaves = function(loader) {
+    const containerClass = '.wave-container';
+    const elementKeys = ['wave1', 'wave2', 'wave3'];
+    game.addSvg(loader, containerClass, elementKeys);
+  }
+
+  game.addSvg = function(loader, containerClass, elementKeys) {
+        elementKeys.forEach((key) => {
+            loader.load_svg('./assets/' + key + '.svg', key, 
                 (name, data) => {
-                        game.processSvg(name, data);
+                        game.processSvg(name, data, containerClass, svg_viewboxes[key]);
                     }, 
                 (name, xhr) => {
                         logger.debug(0, 'xhr load failed for ' + name);
@@ -65,40 +80,42 @@ function Game(name, targetDiv) {
         });
   }
   
-  game.processSvg = function(name, data) {
-    let svg_element = document.querySelector(game.targetDiv + ' .cloud-container').appendChild(data);
+  game.processSvg = function(name, data, containerClass, svg_viewbox) {
+    const svg_element = document.querySelector(game.targetDiv + ' ' + containerClass).appendChild(data);
     svg_element.classList.add("svg-" + name);
-    let playArea = document.querySelector(game.targetDiv).getBoundingClientRect();
+    const playArea = document.querySelector(game.targetDiv).getBoundingClientRect();
     // set the actual SVG element size before changing the zoom in the viewBox
     svg_element.setAttribute("width", playArea.width.toString() + "px");
     svg_element.setAttribute("height", playArea.height.toString() + "px");
     // set the offset to 0,0 (increases shift right, decreases shift left)
-    svg_element.viewBox.baseVal.x = cloud_svg_viewbox[name].base.x;
-    svg_element.viewBox.baseVal.y = cloud_svg_viewbox[name].base.y;
+    svg_element.viewBox.baseVal.x = svg_viewbox.base.x;
+    svg_element.viewBox.baseVal.y = svg_viewbox.base.y;
     // set the size relative to the SVG viewport
-    svg_element.viewBox.baseVal.width = cloud_svg_viewbox[name].base.width;
-    svg_element.viewBox.baseVal.height = cloud_svg_viewbox[name].base.height;
-    // randomise the animation of the cloud
-    let anim = svg_element.querySelector("animateTransform");
-    //anim.setAttribute("begin", Random.getRandomRange(0, 10).toFixed(2).toString() + "s");
-    anim.setAttribute("dur", Random.getRandomRange(20000, 40000).toFixed(2).toString() + "ms");
-    // after 0.2 seconds check if the animation is running
-    setTimeout((animation, element, key, instance) => { 
-        let t = animation.getCurrentTime();
-        if (t == 0) {
-            // remove the svg element and reload
-            // tried to update the animateTransform and svg animations and nothing would work.
-            // might be able to remove and re-add just the animationTransform in its entirety
-            // nope, nor removing all the SVG content and re-adding
-            // what about removing the entire svg element? yep that works!!
-            console.log('kick starting animation ' + name + ' ' + instance); 
-            var animation_new = element.outerHTML;
-            element.remove();
-            console.log("new:" + name + ' ' + instance);
-            setTimeout((target, anim) => {
-                target.insertAdjacentHTML( 'beforeend', anim) ;
-            }, 200, document.querySelector(instance + ' .cloud-container'), animation_new);
-        }}, 200, anim, svg_element, name, game.targetDiv);
+    svg_element.viewBox.baseVal.width = svg_viewbox.base.width;
+    svg_element.viewBox.baseVal.height = svg_viewbox.base.height;
+    if (name.startsWith('cloud')) {
+        // randomise the animation of the cloud
+        const anim = svg_element.querySelector("animateTransform");
+        //anim.setAttribute("begin", Random.getRandomRange(0, 10).toFixed(2).toString() + "s");
+        anim.setAttribute("dur", Random.getRandomRange(20000, 40000).toFixed(2).toString() + "ms");
+        // after 0.2 seconds check if the animation is running
+        setTimeout((animation, element, key, instance) => { 
+            const t = animation.getCurrentTime();
+            if (t == 0) {
+                // remove the svg element and reload
+                // tried to update the animateTransform and svg animations and nothing would work.
+                // might be able to remove and re-add just the animationTransform in its entirety
+                // nope, nor removing all the SVG content and re-adding
+                // what about removing the entire svg element? yep that works!!
+                console.log('kick starting animation ' + name + ' ' + instance); 
+                const animation_new = element.outerHTML;
+                element.remove();
+                console.log("new:" + name + ' ' + instance);
+                setTimeout((target, anim) => {
+                    target.insertAdjacentHTML( 'beforeend', anim) ;
+                }, 200, document.querySelector(instance + ' .cloud-container'), animation_new);
+            }}, 200, anim, svg_element, name, game.targetDiv);
+    }
   }
   
   game.initPlayarea = function() {
@@ -107,6 +124,9 @@ function Game(name, targetDiv) {
     let cloudLayer = document.createElement('div');
     cloudLayer.classList.add('cloud-container');
     playarea.append(cloudLayer);
+    let waveLayer = document.createElement('div');
+    waveLayer.classList.add('wave-container');
+    playarea.append(waveLayer);
   }
   
   // initiate a new level - will destroy all the previous elements if they exist
