@@ -111,3 +111,15 @@ svg, .area-label {
 svg.svg-relative {
   position:relative;
 }
+
+.svg-cloud1 {
+  z-index: 2;
+}
+
+.svg-cloud2 {
+  z-index: 1;
+}
+
+.svg-cloud3 {
+  z-index: 3;
+}

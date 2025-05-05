@@ -68,9 +68,9 @@ Concentrating on the tiles;
   Word selection per level [X]
   calculate letter positions [X]
   animate titles to start locations [ ] - "Bob up CSS vertical animation"
-  tiles draggable [ ]
-  tile release -> closest column [ ]
-  tile bumping [ ]
+  tiles draggable [X]
+  tile release -> closest column [X]
+  tile bumping [X]
   timer for sharks [ ]
   animation for blips [ ]
   shark tile attack [ ]
@@ -92,6 +92,7 @@ Switch sharks for land based animal
 Switch sharks for grabbing hand
 Switch sharks for Unicorns
 Switch waves for dessert - sweets
+Colour palette for clouds to allow fow sunset/rise
 
 
 ##Current issues
@@ -109,7 +110,7 @@ Switch waves for dessert - sweets
 [x]Fix new sized playarea 4 - tiles are not bumping
   - Was a percentage presision thing, stopped constantly recalculating
   
-[ ]Add the clouds
+[X]Add the clouds
   [x]for each container
   [x]fit to containers
     100% 500px 0 0 100 100
@@ -120,6 +121,10 @@ Switch waves for dessert - sweets
     [x] change viewbox via script
     [x] change viewport via script
   [x] x3 clouds
+  [ ] fix cloud ordering
+  [ ] slow down animation
+  [ ] remove yellow
+  [ ] ensure all clouds completely exit the screen before disappearing
     
 [ ]Add the waves
 [ ]Add the radar
@@ -131,9 +136,11 @@ Switch waves for dessert - sweets
 [ ]check the perspective value in the game.css and how it changes with the different play area sizes
 
 
-tweaks
-cloud stroke size
+tweaks/issues
+[ ]cloud stroke size
+[ ]clouds of a smaller size don't make it all the way across the play area
 [x]cloud random starts and durations
+[ ]tile animataions go out of the play area
 
 
 

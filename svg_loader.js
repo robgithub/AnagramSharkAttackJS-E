@@ -33,6 +33,6 @@ function svgLoader() {
           }
         };
         xhr.send();
-        return xhr;
+        return xhr;  // debug
     }
 }
