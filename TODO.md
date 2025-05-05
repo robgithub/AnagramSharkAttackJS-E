@@ -121,10 +121,11 @@ Colour palette for clouds to allow fow sunset/rise
     [x] change viewbox via script
     [x] change viewport via script
   [x] x3 clouds
-  [ ] fix cloud ordering
-  [ ] slow down animation
-  [ ] remove yellow
-  [ ] ensure all clouds completely exit the screen before disappearing
+  [x] fix cloud ordering
+  [x] fix pop ups and sudden disappearing
+  [x] slow down animation
+  [x] remove yellow
+  [x] ensure all clouds completely exit the screen before disappearing
     
 [ ]Add the waves
 [ ]Add the radar

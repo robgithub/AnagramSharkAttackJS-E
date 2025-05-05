@@ -81,8 +81,8 @@ function Game(name, targetDiv) {
     // randomise the animation of the cloud
     let anim = svg_element.querySelector("animateTransform");
     //anim.setAttribute("begin", Random.getRandomRange(0, 10).toFixed(2).toString() + "s");
-    //anim.setAttribute("dur", Random.getRandomRange(10, 20).toFixed(2).toString() + "s");
-    // after 2 seconds check if the animation is running
+    anim.setAttribute("dur", Random.getRandomRange(20000, 40000).toFixed(2).toString() + "ms");
+    // after 0.2 seconds check if the animation is running
     setTimeout((animation, element, key, instance) => { 
         let t = animation.getCurrentTime();
         if (t == 0) {
@@ -90,7 +90,7 @@ function Game(name, targetDiv) {
             // tried to update the animateTransform and svg animations and nothing would work.
             // might be able to remove and re-add just the animationTransform in its entirety
             // nope, nor removing all the SVG content and re-adding
-            // what about removing the entire svg element?
+            // what about removing the entire svg element? yep that works!!
             console.log('kick starting animation ' + name + ' ' + instance); 
             var animation_new = element.outerHTML;
             element.remove();
